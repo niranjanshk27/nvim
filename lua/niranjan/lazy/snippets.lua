@@ -14,16 +14,17 @@ return {
             ls.filetype_extend("javascript", { "jsdoc" })
 
             --- TODO: What is expand?
-            vim.keymap.set({"i"}, "<C-s>e", function() ls.expand() end, {silent = true})
+            --- It tries to expand a snippet if you're on a valid trigger.
+            vim.keymap.set({"i"}, "<C-s>e", function() ls.expand() end, {desc = "Expand a snippet fi valid.",silent = true})
 
-            vim.keymap.set({"i", "s"}, "<C-s>;", function() ls.jump(1) end, {silent = true})
-            vim.keymap.set({"i", "s"}, "<C-s>,", function() ls.jump(-1) end, {silent = true})
+            vim.keymap.set({"i", "s"}, "<C-s>;", function() ls.jump(1) end, {desc = "Jump forward inside a snippet", silent = true})
+            vim.keymap.set({"i", "s"}, "<C-s>,", function() ls.jump(-1) end, {desc = "Jump backward", silent = true})
 
             vim.keymap.set({"i", "s"}, "<C-E>", function()
                 if ls.choice_active() then
                     ls.change_choice(1)
                 end
-            end, {silent = true})
+            end, {desc = "Cycle through multiple options (choice nodes).", silent = true})
         end,
     }
 }
