@@ -27,14 +27,13 @@ return {
   config = function()
     -- LSP keymaps
     local on_attach = function (_, bufnr)
-      local opts = { noremap = true, silent = true, buffer = bufnr }
-      vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-      vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-      vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-      vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-      vim.keymap.set("n", "<leader>K", vim.lsp.buf.hover, opts)
-      vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, opts)
-      -- vim.keymap.set("n", "v", "<leader>ca", vim.lsp.buf.code_action, opts)
+      vim.keymap.set("n", "gd", vim.lsp.buf.definition, { noremap = true, silent = true, buffer = bufnr, desc = "Goto Definition" })
+      vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { noremap = true, silent = true, buffer = bufnr, desc = "Goto Declaration" })
+      vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { noremap = true, silent = true, buffer = bufnr, desc = "Goto Implementation" })
+      vim.keymap.set("n", "gr", vim.lsp.buf.references, { noremap = true, silent = true, buffer = bufnr, desc = "References" })
+      vim.keymap.set("n", "<leader>K", vim.lsp.buf.hover, { noremap = true, silent = true, buffer = bufnr, desc = "Hover" })
+      vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, { noremap = true, silent = true, buffer = bufnr, desc = "Function Rename" })
+      -- vim.keymap.set("n", "v", "<leader>ca", vim.lsp.buf.code_action, { noremap = true, silent = true, buffer = bufnr, desc = "Code Action" })
     end
 
     require("conform").setup({
