@@ -84,7 +84,7 @@ return {
     -- Persistent find_files
     local function find_files_with_flags()
       builtin.find_files(vim.tbl_extend("force", find_files_opts, {
-        prompt_title = string.format("Find Filse (hidden: %s | ignore: %s | follow: %s)",
+        prompt_title = string.format("Find Files (hidden: %s | ignore: %s | follow: %s)",
           tostring(find_files_opts.hidden),
           tostring(find_files_opts.no_ignore),
           tostring(find_files_opts.follow)
@@ -96,6 +96,12 @@ return {
     load_flags()
 
     -- Keymaps
+    vim.keymap.set("n", "<leader>pF", function()
+      builtin.find_files({
+        cwd = "~/workspace"
+      })
+    end, { desc = "Find files ([G]lobal [F]iles)"})
+
     vim.keymap.set('n', '<leader>pf', find_files_with_flags, { desc = "Find files (with persistent flags)" })
     vim.keymap.set('n', '<leader>tt', toggle_all_flags, { desc = "Toggle all find_files flags" })
     vim.keymap.set('n', '<leader>th', function() toggle_flag("hidden") end, { desc = "Toggle hidden files" })

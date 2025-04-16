@@ -5,7 +5,8 @@ return {
         require('lualine').setup {
             options = {
                 icons_enabled = true,
-                theme = 'gruvbox',  -- You can use any theme here
+                -- theme = 'gruvbox',  -- You can use any theme here
+                theme = 'solarized_dark',  -- You can use any theme here
                 component_separators = '',
                 section_separators = '',
             },
