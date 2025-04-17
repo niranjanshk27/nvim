@@ -9,20 +9,24 @@ return {
     local telescope = require("telescope")
     local builtin = require("telescope.builtin")
     local Path = require("plenary.path")
+    local actions = require("telescope.actions")
+    local action_state = require("telescope.actions.state")
+    local pickers = require("telescope.pickers")
+    local finders = require("telescope.finders")
+    local conf = require("telescope.config").values
 
     telescope.setup({})
 
-    -- File store path: ~/.local/share/nvim/telescope_flags.json
+    --------------------------------------------------
+    -- Persistent flags for find_files
+    --------------------------------------------------
     local flag_file_path = vim.fn.stdpath("data") .. "/telescope_flags.json"
-
-    -- Default values
     local find_files_opts = {
       hidden = false,
       no_ignore = false,
       follow = false,
     }
 
-    -- Load flags from file
     local function load_flags()
       local flag_file = Path:new(flag_file_path)
       if flag_file:exists() then
@@ -34,13 +38,10 @@ return {
       end
     end
 
-    -- Save flags to file
     local function save_flags()
-      local flag_file = Path:new(flag_file_path)
-      flag_file:write(vim.fn.json_encode(find_files_opts), "w")
+      Path:new(flag_file_path):write(vim.fn.json_encode(find_files_opts), "w")
     end
 
-    -- Notify current flag status
     local function notify_flags()
       vim.notify(string.format(
         "Find Files Flags:\n• hidden: %s\n• no_ignore: %s\n• follow: %s",
@@ -50,39 +51,23 @@ return {
       ), vim.log.levels.INFO, { title = "Telescope Flags" })
     end
 
-    -- Toggle helpers
     local function toggle_flag(key)
       find_files_opts[key] = not find_files_opts[key]
       save_flags()
-      builtin.find_files(vim.tbl_extend("force", find_files_opts, {
-        prompt_title = string.format("Find Filse (hidden: %s | ignore: %s | follow: %s)",
-          tostring(find_files_opts.hidden),
-          tostring(find_files_opts.no_ignore),
-          tostring(find_files_opts.follow)
-        )
-      }))
+      find_files_with_flags()
       notify_flags()
     end
 
-    -- Toggle all flags
     local function toggle_all_flags()
       for k in pairs(find_files_opts) do
         find_files_opts[k] = not find_files_opts[k]
       end
       save_flags()
-      local opts = vim.tbl_extend("force", find_files_opts, {
-        prompt_title = string.format("Find Files (hidden: %s | ignore: %s | follow: %s)",
-          tostring(find_files_opts.hidden),
-          tostring(find_files_opts.no_ignore),
-          tostring(find_files_opts.follow)
-        )
-      })
-      builtin.find_files(opts)
+      find_files_with_flags()
       notify_flags()
     end
 
-    -- Persistent find_files
-    local function find_files_with_flags()
+    function find_files_with_flags()
       builtin.find_files(vim.tbl_extend("force", find_files_opts, {
         prompt_title = string.format("Find Files (hidden: %s | ignore: %s | follow: %s)",
           tostring(find_files_opts.hidden),
@@ -92,35 +77,133 @@ return {
       }))
     end
 
-    -- Load saved flags on startup
+    --------------------------------------------------
+    -- Incremental fd-powered custom picker
+    --------------------------------------------------
+    local toggle_state = {
+      hidden = false,
+      no_ignore = false,
+      depth = 1,
+    }
+
+    local function build_fd_command(query, dir)
+      local cmd = { 'fd', '--type', 'f', '--type', 'd', '--base-directory', dir, '--search-path', '.' }
+
+      if toggle_state.hidden then table.insert(cmd, '--hidden') end
+      if toggle_state.no_ignore then table.insert(cmd, '--no-ignore') end
+      if toggle_state.depth > 0 then table.insert(cmd, '--max-depth=' .. toggle_state.depth) end
+
+      if query ~= '' then table.insert(cmd, query) end
+      return cmd
+    end
+
+    local function get_toggle_status(num)
+      local function status(flag, char) return flag and '[' .. char:upper() .. ']' or '[' .. char:lower() .. ']' end
+      local parts = {
+        status(toggle_state.no_ignore, 'I'),
+        status(toggle_state.hidden, 'H'),
+        status(toggle_state.depth == 0, 'R'),
+      }
+      if num >= 5000 then table.insert(parts, '[❗]') end
+      return table.concat(parts, '') .. ' '
+    end
+
+    local function incremental_fd_search(query, dir, label)
+      local cmd = build_fd_command(query, dir)
+      local results = vim.fn.systemlist(cmd)
+
+      pickers.new({}, {
+        prompt_title = get_toggle_status(#results) .. 'Find in ' .. label,
+        finder = finders.new_table {
+          results = results,
+          entry_maker = function(entry)
+            return {
+              value = entry,
+              display = entry,
+              ordinal = entry,
+              path = Path:new(dir, entry):absolute():gsub('//', '/'),
+            }
+          end,
+        },
+        sorter = conf.generic_sorter(),
+        default_text = query,
+        attach_mappings = function(prompt_bufnr, map)
+          local current_input = function()
+            return action_state.get_current_line()
+          end
+
+          local refresh_picker = function(modify)
+            local input = current_input()
+            modify()
+            actions.close(prompt_bufnr)
+            incremental_fd_search(input, dir, label)
+          end
+
+          map('i', '<C-h>', function() refresh_picker(function() toggle_state.hidden = not toggle_state.hidden end) end)
+          map('i', '<C-i>', function() refresh_picker(function() toggle_state.no_ignore = not toggle_state.no_ignore end) end)
+          map('i', '<C-d>', function() refresh_picker(function() toggle_state.depth = toggle_state.depth == 0 and 1 or 0 end) end)
+          map('i', '<BS>', function()
+            if current_input() == '' then
+              actions.close(prompt_bufnr)
+              local parent = Path:new(dir):parent().filename
+              incremental_fd_search('', parent, '⬆️ Up')
+            else
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<BS>', true, false, true), 'n', true)
+            end
+          end)
+
+          actions.select_default:replace(function()
+            local entry = action_state.get_selected_entry()
+            if not entry or not entry.path then return end
+            actions.close(prompt_bufnr)
+            local path = entry.path
+            if Path:new(path):is_dir() then
+              incremental_fd_search('', path, '📁 Descend')
+            else
+              vim.cmd("edit " .. vim.fn.fnameescape(path))
+            end
+          end)
+
+          return true
+        end
+      }):find()
+    end
+
+    --------------------------------------------------
+    -- Commands for launching fd-based search
+    --------------------------------------------------
+    vim.api.nvim_create_user_command('TelescopeFindRoot', function()
+      local dir = vim.fn.getcwd()
+      incremental_fd_search('', dir, '📦 Root')
+    end, {})
+
+    vim.api.nvim_create_user_command('TelescopeFindBufferDir', function()
+      local path = vim.api.nvim_buf_get_name(0)
+      local dir = path ~= '' and Path:new(path):parent().filename or vim.fn.getcwd()
+      incremental_fd_search('', dir, '🗂️ Buffer')
+    end, {})
+
+    --------------------------------------------------
+    -- Keymaps
+    --------------------------------------------------
     load_flags()
 
-    -- Keymaps
-    vim.keymap.set("n", "<leader>pF", function()
-      builtin.find_files({
-        cwd = "~/workspace"
-      })
-    end, { desc = "Find files ([G]lobal [F]iles)"})
-
-    vim.keymap.set('n', '<leader>pf', find_files_with_flags, { desc = "Find files (with persistent flags)" })
-    vim.keymap.set('n', '<leader>tt', toggle_all_flags, { desc = "Toggle all find_files flags" })
-    vim.keymap.set('n', '<leader>th', function() toggle_flag("hidden") end, { desc = "Toggle hidden files" })
-    vim.keymap.set('n', '<leader>ti', function() toggle_flag("no_ignore") end, { desc = "Toggle ignore files" })
+    vim.keymap.set('n', '<leader>pf', find_files_with_flags, { desc = "Find files (persistent flags)" })
+    vim.keymap.set('n', '<leader>tt', toggle_all_flags, { desc = "Toggle all flags" })
+    vim.keymap.set('n', '<leader>th', function() toggle_flag("hidden") end, { desc = "Toggle hidden" })
+    vim.keymap.set('n', '<leader>ti', function() toggle_flag("no_ignore") end, { desc = "Toggle no_ignore" })
     vim.keymap.set('n', '<leader>tf', function() toggle_flag("follow") end, { desc = "Toggle follow symlinks" })
+    vim.keymap.set('n', '<leader>fr', '<cmd>TelescopeFindRoot<CR>', { desc = "FD find in root" })
+    vim.keymap.set('n', '<leader>fb', '<cmd>TelescopeFindBufferDir<CR>', { desc = "FD find in buffer dir" })
 
     vim.keymap.set('n', '<C-p>', builtin.git_files, { desc = "Git files" })
     vim.keymap.set('n', '<leader>fw', builtin.live_grep, { desc = "Live grep" })
-
+    vim.keymap.set('n', '<leader>vh', builtin.help_tags, { desc = "Help tags" })
     vim.keymap.set('n', '<leader>pWs', function()
-      local word = vim.fn.expand("<cWORD>")
-      builtin.grep_string({ search = word })
-    end, { desc = "Search full WORD under cursor" })
-
+      builtin.grep_string({ search = vim.fn.expand("<cWORD>") })
+    end, { desc = "Search current WORD" })
     vim.keymap.set('n', '<leader>ps', function()
       builtin.grep_string({ search = vim.fn.input("Grep > ") })
     end, { desc = "Search by input" })
-
-    vim.keymap.set('n', '<leader>vh', builtin.help_tags, { desc = "Help tags" })
   end
 }
-
