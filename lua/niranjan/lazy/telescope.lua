@@ -195,6 +195,30 @@ return {
     vim.keymap.set('n', '<leader>tf', function() toggle_flag("follow") end, { desc = "Toggle follow symlinks" })
     vim.keymap.set('n', '<leader>fr', '<cmd>TelescopeFindRoot<CR>', { desc = "FD find in root" })
     vim.keymap.set('n', '<leader>fb', '<cmd>TelescopeFindBufferDir<CR>', { desc = "FD find in buffer dir" })
+    
+    vim.keymap.set('n', '<leader>bb', function ()
+      builtin.buffers({
+        sort_mru = true,
+        ignore_current_buffer = true,
+        -- previewer = false,
+        -- mappings = {
+        --   i = {
+        --     ["<C-k>"] = function ()
+        --       local current_picker = action_state.get_selected_entry()
+        --       actions.close(prompt_bufnr)
+        --       vim.api.nvim_buf_delete(current_picker.bufnr, { force = true})
+        --     end,
+        --   },
+        --   n = {
+        --     ["<C-k>"] = function ()
+        --       local current_picker = action_state.get_selected_entry()
+        --       actions.close(prompt_bufnr)
+        --       vim.api.nvim_buf_delete(current_picker.bufnr, { force = true })
+        --     end   
+        --   },
+        -- }
+      })
+    end, { desc = "Buffer list" })
 
     vim.keymap.set('n', '<C-p>', builtin.git_files, { desc = "Git files" })
     vim.keymap.set('n', '<leader>fw', builtin.live_grep, { desc = "Live grep" })

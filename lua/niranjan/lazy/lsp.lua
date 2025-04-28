@@ -23,6 +23,8 @@ return {
     "L3MON4D3/LuaSnip",
     "saadparwaiz1/cmp_luasnip",
     "j-hui/fidget.nvim",
+    "rafamadriz/friendly-snippets", -- useful snippets
+    "onsails/lspkind.nvim", -- vs-code like pictograms
   },
   config = function()
     -- LSP keymaps
@@ -110,11 +112,19 @@ return {
     })
 
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
+    
+    local luasnip = require("luasnip")
+    local lspkind = require("lspkind")
+    -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
+    require("luasnip.loaders.from_vscode").lazy_load()
 
     cmp.setup({
+      completion = {
+        completeopt = "menu,menuone,preview,noselect",
+      },
       snippet = {
         expand = function(args)
-          require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+          luasnip.lsp_expand(args.body) -- For `luasnip` users.
         end,
       },
       mapping = cmp.mapping.preset.insert({
@@ -128,14 +138,24 @@ return {
           end
         end, {"i", "s"}),
         ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.abort(), -- close completion window
       }),
+      -- sources for autocompletion
       sources = cmp.config.sources({
         { name = "copilot", group_index = 2 },
         { name = 'nvim_lsp' },
         { name = 'luasnip' }, -- For luasnip users.
-      }, {
-          { name = 'buffer' },
+        { name = 'buffer' }, -- text within current buffer
+        { name = 'path' } -- file system path
+      }),
+      
+      -- configure lspkind for vs-code like pictograms in completion menu
+      formatting = {
+        format = lspkind.cmp_format({
+          maxwidth = 50,
+          ellipsis_char = "...",
         })
+      }
     })
 
     vim.diagnostic.config({
