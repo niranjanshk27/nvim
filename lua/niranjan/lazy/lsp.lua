@@ -35,7 +35,10 @@ return {
       vim.keymap.set("n", "gr", vim.lsp.buf.references, { noremap = true, silent = true, buffer = bufnr, desc = "References" })
       vim.keymap.set("n", "<leader>K", vim.lsp.buf.hover, { noremap = true, silent = true, buffer = bufnr, desc = "Hover" })
       vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, { noremap = true, silent = true, buffer = bufnr, desc = "Function Rename" })
-      -- vim.keymap.set("n", "v", "<leader>ca", vim.lsp.buf.code_action, { noremap = true, silent = true, buffer = bufnr, desc = "Code Action" })
+      vim.keymap.set("n", "<leader>vd", vim.lsp.buf.code_action, { noremap = true, silent = true, buffer = bufnr, desc = "Code Action" })
+      vim.keymap.set("n", "<leader>vs", vim.diagnostic.open_float, { noremap = true, silent = true, buffer = bufnr, desc = "Show Diagnostics" })
+      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
+      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
     end
 
     require("conform").setup({
@@ -152,14 +155,18 @@ return {
       -- configure lspkind for vs-code like pictograms in completion menu
       formatting = {
         format = lspkind.cmp_format({
-          maxwidth = 50,
+          maxwidth = 80,
           ellipsis_char = "...",
         })
       }
     })
 
     vim.diagnostic.config({
-      -- update_in_insert = true,
+      virtual_text = true,
+      signs = true,
+      underline = true,
+      update_in_insert = true,
+      severity_sort = true,
       float = {
         focusable = false,
         style = "minimal",
