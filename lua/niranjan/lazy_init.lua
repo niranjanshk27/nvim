@@ -14,9 +14,9 @@ require("lazy").setup({
 })
 
 -- open in safari if markdown file is open
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "markdown",
-    callback = function ()
-        require("peek").open()
-    end,
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+--     pattern = "markdown",
+--     callback = function ()
+--         require("peek").open()
+--     end,
+-- })
