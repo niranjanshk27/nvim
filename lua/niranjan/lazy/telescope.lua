@@ -25,6 +25,7 @@ return {
       hidden = false,
       no_ignore = false,
       follow = false,
+      file_ignore_patterns = { "%.git/" },  -- Ignore `.git/` folder
     }
 
     local function load_flags()
