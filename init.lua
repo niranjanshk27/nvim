@@ -1,1 +1,1 @@
-require("niranjan"); 
+require("niranjan");
