@@ -10,7 +10,7 @@ vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Jump half-page Down", noremap 
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Jump half-page Up", noremap = true, silent = true })
 
 -- global replace
-vim.keymap.set("n", "<leader>gr", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>", {desc = "Global replace", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>rr", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>", {desc = "Global replace", noremap = true, silent = true })
 
 
 -- This mapping preserves your clipboard/yank buffer, making pasting over text non-destructive to your copy.

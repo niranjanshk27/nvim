@@ -63,7 +63,8 @@ return {
         "rust_analyzer",
         "gopls",
         "ts_ls",
-        "pylsp"
+        "pylsp",
+        "ruby_lsp"
       },
       handlers = {
         function(server_name) -- default handler (optional)
@@ -89,7 +90,6 @@ return {
           })
           vim.g.zig_fmt_parse_errors = 0
           vim.g.zig_fmt_autosave = 0
-
         end,
         ["lua_ls"] = function()
           local lspconfig = require("lspconfig")
@@ -109,6 +109,15 @@ return {
                 },
               }
             }
+          }
+        end,
+        ["ruby_lsp"] = function()
+          local lspconfig = require("lspconfig")
+          lspconfig.ruby_lsp.setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+            filetypes = { "ruby", "Fastfile" }, -- explicitly add Fastfile
+            root_dir = lspconfig.util.root_pattern("Fastfile", ".git"),
           }
         end,
       }
@@ -163,7 +172,7 @@ return {
 
     vim.diagnostic.config({
       virtual_text = true,
-      signs = true,
+      signs = false,
       underline = true,
       update_in_insert = true,
       severity_sort = true,
