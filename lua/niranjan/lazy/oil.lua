@@ -11,8 +11,17 @@ return {
 
   config = function()
     require("oil").setup({
-      default_file_explorer = false,
-      use_default_keymaps = false
-    }) 
+      default_file_explorer = true,
+      use_default_keymaps = true,
+      colums = {
+        "icon",
+        -- "permissions",
+        -- "size",
+        -- "mtime"
+      },
+      view_options = {
+        show_hidden = true
+      }
+    })
   end
 }
