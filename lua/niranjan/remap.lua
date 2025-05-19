@@ -1,5 +1,6 @@
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, {desc = "Open file Explore. Same as :Ex"})
+-- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, {desc = "Open file Explore. Same as :Ex"})
+vim.keymap.set("n", "<leader>pv", "<CMD>Oil<CR>", {desc = "Open file Explore. Same as :Ex"})
 
 -- move highlighted line(s) up and down
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move highlighted line Down", noremap = true, silent = true })
