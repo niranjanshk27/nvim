@@ -65,7 +65,8 @@ return {
         "pylsp",
         "ruby_lsp",
         "tflint",
-        "jsonls"
+        "jsonls",
+        "terraformls"
       },
       handlers = {
         function(server_name) -- default handler (optional)
