@@ -25,5 +25,9 @@ vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Yank line to system clipboar
 vim.keymap.set({ "n", "v" }, "<leader>pp", [["+p]], { desc = "Paste from system clipboard" })
 vim.keymap.set("n", "<leader>PP", [["+P]], { desc = "Paste before from system clipboard" })
 
+-- Buffer navigation
+vim.keymap.set("n", "<C-o>", ":bnext<CR>", { desc = "Next buffer", noremap = true, silent = true })
+vim.keymap.set("n", "<C-i>", ":bprevious<CR>", { desc = "Previous buffer", noremap = true, silent = true })
+
 -- leader + s to save the file.
 -- vim.keymap.set('n', '<leader>s', ':w<CR>', { noremap = true, silent = true, desc = "Save file" })

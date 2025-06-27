@@ -14,13 +14,6 @@ require("lazy").setup({
   change_detection = { notify = false },
 })
 
--- File type indicator
-vim.filetype.add({
-  filename = {
-    ["Fastfile"] = "ruby",
-  },
-})
-
 -- open in safari if markdown file is open
 -- vim.api.nvim_create_autocmd("FileType", {
 --     pattern = "markdown",
