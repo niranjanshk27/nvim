@@ -28,6 +28,7 @@ return {
     "b0o/schemastore.nvim" -- json
   },
   config = function()
+    vim.lsp.set_log_level("warn")
     -- LSP keymaps
     local on_attach = function (_, bufnr)
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { noremap = true, silent = true, buffer = bufnr, desc = "Goto Definition" })
@@ -47,7 +48,6 @@ return {
 
     local cmp = require('cmp')
     local cmp_lsp = require("cmp_nvim_lsp")
-
     local capabilities = vim.tbl_deep_extend(
       "force",
       {},
@@ -75,7 +75,6 @@ return {
             on_attach = on_attach
           }
         end,
-
         zls = function()
           local lspconfig = require("lspconfig")
           lspconfig.zls.setup({
@@ -122,7 +121,6 @@ return {
             root_dir = lspconfig.util.root_pattern("Fastfile", ".git"),
           }
         end,
-
         ["jsonls"] = function()
           local lspconfig = require("lspconfig")
           local schemastore = require("schemastore")
@@ -142,7 +140,6 @@ return {
     })
 
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
-    
     local luasnip = require("luasnip")
     local lspkind = require("lspkind")
 
@@ -164,12 +161,25 @@ return {
         ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
-            cmp.confirm({ select = true })
+            if cmp.get_selected_entry() == nil then
+              cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+            else
+              cmp.confirm({ select = false })
+            end
           else
             fallback()
           end
-        end, {"i", "s"}),
-        ["<C-Space>"] = cmp.mapping.complete(),
+        end, { "i", "s" }),
+        -- Use <CR> to confirm selection
+        ["<CR>"] = cmp.mapping(function(fallback)
+          if cmp.visible() and cmp.get_selected_entry() ~= nil then
+            cmp.confirm({ select = false })
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+
+        ["<M-Space>"] = cmp.mapping.complete(),
         ["<C-e>"] = cmp.mapping.abort(), -- close completion window
       }),
       -- sources for autocompletion
@@ -180,7 +190,6 @@ return {
         { name = 'buffer' }, -- text within current buffer
         { name = 'path' } -- file system path
       }),
-      
       -- configure lspkind for vs-code like pictograms in completion menu
       formatting = {
         format = lspkind.cmp_format({
