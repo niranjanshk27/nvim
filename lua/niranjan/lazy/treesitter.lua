@@ -2,50 +2,64 @@ return {
     {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter-textobjects",
+            "nvim-treesitter/nvim-treesitter-context",
+            "nvim-treesitter/nvim-treesitter-refactor",
+            "nvim-treesitter/playground",
+            "JoosepAlviste/nvim-ts-context-commentstring",
+        },
         config = function()
             require("nvim-treesitter.configs").setup({
-                -- A list of parser names, or "all"
+                -- Parser installation
                 ensure_installed = {
-                    "vimdoc", "javascript", "typescript", "c", "lua", "rust",
-                    "jsdoc", "bash", "markdown", "markdown_inline", "terraform", "hcl"
+                    -- Core languages
+                    "c", "cpp", "rust", "go", "zig",
+                    -- Web development
+                    "javascript", "typescript", "tsx", "html", "css", "scss", "json", "jsonc",
+                    -- Scripting
+                    "lua", "python", "bash", "fish",
+                    -- Markup and documentation
+                    "markdown", "markdown_inline", "latex", "bibtex", "rst",
+                    -- Configuration
+                    "yaml", "toml", "dockerfile", "terraform", "hcl",
+                    -- Documentation
+                    "vimdoc", "comment", "jsdoc",
+                    -- Data formats
+                    "xml", "csv",
+                    -- Other useful parsers
+                    "regex", "sql", "graphql", "make", "cmake", "ninja",
+                    -- Version control
+                    "git_config", "git_rebase", "gitattributes", "gitcommit", "gitignore",
+                    -- Query language
+                    "query", -- For treesitter query files
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
                 sync_install = false,
 
                 -- Automatically install missing parsers when entering buffer
-                -- Recommendation: set to false if you don"t have `tree-sitter` CLI installed locally
                 auto_install = true,
 
-                indent = {
-                    enable = true
-                },
+                -- Ignore install for these parsers
+                ignore_install = {},
 
-                fold = {
-                    enable = true,
-                --     disable = function(lang, buf)
-                --         local max_filesize = 100 * 1024 -- 100 KB
-                --         local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-                --         if ok and stats and stats.size > max_filesize then
-                --             return true
-                --         end
-                --     end,
-                },
-
+                -- HIGHLIGHTING
                 highlight = {
-                    -- `false` will disable the whole extension
                     enable = true,
                     disable = function(lang, buf)
-                        if lang == "html" then
-                            print("disabled")
+                        -- Disable for specific languages if needed
+                        local disabled_langs = {}
+                        if vim.tbl_contains(disabled_langs, lang) then
                             return true
                         end
 
+                        -- Disable for large files
                         local max_filesize = 100 * 1024 -- 100 KB
                         local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
                         if ok and stats and stats.size > max_filesize then
                             vim.notify(
-                                "File larger than 100KB treesitter disabled for performance",
+                                "File larger than 100KB - treesitter disabled for performance",
                                 vim.log.levels.WARN,
                                 {title = "Treesitter"}
                             )
@@ -53,47 +67,269 @@ return {
                         end
                     end,
 
-                    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-                    -- Set this to `true` if you depend on "syntax" being enabled (like for indentation).
-                    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-                    -- Instead of true it can also be a list of languages
+                    -- Use treesitter highlighting alongside vim regex highlighting
                     additional_vim_regex_highlighting = { "markdown" },
                 },
+
+                -- INCREMENTAL SELECTION
+                incremental_selection = {
+                    enable = true,
+                    keymaps = {
+                        init_selection = "<C-space>",
+                        node_incremental = "<C-space>",
+                        scope_incremental = "<C-s>",
+                        node_decremental = "<C-backspace>",
+                    },
+                },
+
+                -- INDENTATION
+                indent = {
+                    enable = true,
+                    disable = { "python", "yaml" }, -- These languages have better indentation from other sources
+                },
+
+                -- FOLDING
+                fold = {
+                    enable = true,
+                    disable = {},
+                },
+
+                -- TEXT OBJECTS
+                textobjects = {
+                    select = {
+                        enable = true,
+                        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+                        keymaps = {
+                            -- You can use the capture groups defined in textobjects.scm
+                            ["af"] = "@function.outer",
+                            ["if"] = "@function.inner",
+                            ["ac"] = "@class.outer",
+                            ["ic"] = "@class.inner",
+                            ["aa"] = "@parameter.outer",
+                            ["ia"] = "@parameter.inner",
+                            ["ab"] = "@block.outer",
+                            ["ib"] = "@block.inner",
+                            ["ai"] = "@conditional.outer",
+                            ["ii"] = "@conditional.inner",
+                            ["al"] = "@loop.outer",
+                            ["il"] = "@loop.inner",
+                            ["ak"] = "@comment.outer",
+                            ["ik"] = "@comment.inner",
+                        },
+                        selection_modes = {
+                            ['@parameter.outer'] = 'v', -- charwise
+                            ['@function.outer'] = 'V', -- linewise
+                            ['@class.outer'] = '<c-v>', -- blockwise
+                        },
+                        include_surrounding_whitespace = true,
+                    },
+                    swap = {
+                        enable = true,
+                        swap_next = {
+                            ["<leader>a"] = "@parameter.inner",
+                            ["<leader>f"] = "@function.outer",
+                        },
+                        swap_previous = {
+                            ["<leader>A"] = "@parameter.inner",
+                            ["<leader>F"] = "@function.outer",
+                        },
+                    },
+                    move = {
+                        enable = true,
+                        set_jumps = true, -- whether to set jumps in the jumplist
+                        goto_next_start = {
+                            ["]m"] = "@function.outer",
+                            ["]]"] = "@class.outer",
+                            ["]a"] = "@parameter.inner",
+                        },
+                        goto_next_end = {
+                            ["]M"] = "@function.outer",
+                            ["]["] = "@class.outer",
+                            ["]A"] = "@parameter.inner",
+                        },
+                        goto_previous_start = {
+                            ["[m"] = "@function.outer",
+                            ["[["] = "@class.outer",
+                            ["[a"] = "@parameter.inner",
+                        },
+                        goto_previous_end = {
+                            ["[M"] = "@function.outer",
+                            ["[]"] = "@class.outer",
+                            ["[A"] = "@parameter.inner",
+                        },
+                    },
+                    lsp_interop = {
+                        enable = true,
+                        border = 'none',
+                        floating_preview_opts = {},
+                        peek_definition_code = {
+                            ["<leader>df"] = "@function.outer",
+                            ["<leader>dF"] = "@class.outer",
+                        },
+                    },
+                },
+
+                -- REFACTOR MODULE
+                refactor = {
+                    highlight_definitions = {
+                        enable = true,
+                        -- Set to false if you have an `updatetime` of ~100.
+                        clear_on_cursor_move = true,
+                    },
+                    highlight_current_scope = { enable = false }, -- Can be distracting
+                    smart_rename = {
+                        enable = true,
+                        keymaps = {
+                            smart_rename = "grr",
+                        },
+                    },
+                    navigation = {
+                        enable = true,
+                        keymaps = {
+                            goto_definition = "gnd",
+                            list_definitions = "gnD",
+                            list_definitions_toc = "gO",
+                            goto_next_usage = "<a-*>",
+                            goto_previous_usage = "<a-#>",
+                        },
+                    },
+                },
+
+                -- PLAYGROUND
+                playground = {
+                    enable = true,
+                    disable = {},
+                    updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+                    persist_queries = false, -- Whether the query persists across vim sessions
+                    keybindings = {
+                        toggle_query_editor = 'o',
+                        toggle_hl_groups = 'i',
+                        toggle_injected_languages = 't',
+                        toggle_anonymous_nodes = 'a',
+                        toggle_language_display = 'I',
+                        focus_language = 'f',
+                        unfocus_language = 'F',
+                        update = 'R',
+                        goto_node = '<cr>',
+                        show_help = '?',
+                    },
+                },
+
+                -- QUERY LINTER
+                query_linter = {
+                    enable = true,
+                    use_virtual_text = true,
+                    lint_events = {"BufWrite", "CursorHold"},
+                },
+
+
             })
 
-            local treesitter_parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-            treesitter_parser_config.templ = {
+            -- Custom parser configurations
+            local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+            
+            -- Templ parser (Go templating)
+            parser_config.templ = {
                 install_info = {
                     url = "https://github.com/vrischmann/tree-sitter-templ.git",
                     files = {"src/parser.c", "src/scanner.c"},
                     branch = "master",
                 },
+                filetype = "templ",
             }
 
+            -- Blade parser (Laravel templating)
+            parser_config.blade = {
+                install_info = {
+                    url = "https://github.com/EmranMR/tree-sitter-blade",
+                    files = {"src/parser.c"},
+                    branch = "main",
+                },
+                filetype = "blade",
+            }
+
+            -- Register custom languages
             vim.treesitter.language.register("templ", "templ")
+            vim.treesitter.language.register("blade", "blade")
+
+            -- Custom commands
+            vim.api.nvim_create_user_command("TSPlaygroundToggle", function()
+                require("nvim-treesitter-playground.internal").toggle()
+            end, {})
+
+            -- Set folding method to use treesitter
+            vim.wo.foldmethod = "expr"
+            vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+            vim.wo.foldlevel = 99 -- Start with most folds open
+            vim.opt.foldlevelstart = 99 -- Start with most folds open (global option)
+
+            -- Custom highlights for better visibility
+            vim.cmd([[
+                hi TSDefinition guifg=#61AFEF
+                hi TSDefinitionUsage guifg=#E06C75
+                hi TSCurrentScope guibg=#3E4451
+            ]])
         end
     },
 
+    -- TREESITTER CONTEXT
     {
         "nvim-treesitter/nvim-treesitter-context",
-        after = "nvim-treesitter",
+        event = "BufReadPost",
         config = function()
-            require'treesitter-context'.setup{
-                enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
-                multiwindow = false, -- Enable multiwindow support.
-                max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
-                min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+            require("treesitter-context").setup({
+                enable = true,
+                multiwindow = false,
+                max_lines = 0, -- No limit
+                min_window_height = 0, -- No minimum
                 line_numbers = true,
-                multiline_threshold = 20, -- Maximum number of lines to show for a single context
-                trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-                mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
-                -- Separator between context and content. Should be a single character string, like '-'.
-                -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+                multiline_threshold = 20,
+                trim_scope = 'outer',
+                mode = 'cursor',
                 separator = nil,
-                zindex = 20, -- The Z-index of the context window
-                on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
-            }
-        end
-    }
-}
+                zindex = 20,
+                on_attach = function(buf)
+                    -- Don't attach to certain filetypes
+                    local excluded_ft = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" }
+                    return not vim.tbl_contains(excluded_ft, vim.bo[buf].filetype)
+                end,
+            })
 
+            -- Custom keymaps for context
+            vim.keymap.set("n", "[c", function()
+                require("treesitter-context").go_to_context()
+            end, { silent = true, desc = "Go to context" })
+        end
+    },
+
+    -- CONTEXT COMMENTSTRING
+    {
+        "JoosepAlviste/nvim-ts-context-commentstring",
+        event = "BufReadPost",
+        config = function()
+            vim.g.skip_ts_context_commentstring_module = true
+            require("ts_context_commentstring").setup({
+                enable_autocmd = false,
+            })
+        end
+    },
+
+    -- TREESITTER TEXTOBJECTS
+    {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        after = "nvim-treesitter",
+    },
+
+    -- TREESITTER REFACTOR
+    {
+        "nvim-treesitter/nvim-treesitter-refactor",
+        after = "nvim-treesitter",
+    },
+
+    -- PLAYGROUND
+    {
+        "nvim-treesitter/playground",
+        cmd = "TSPlaygroundToggle",
+        after = "nvim-treesitter",
+    },
+}
