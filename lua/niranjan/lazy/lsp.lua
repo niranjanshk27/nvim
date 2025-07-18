@@ -134,10 +134,10 @@ return {
         ruby = { "rubocop" },
         terraform = { "terraform_fmt" },
       },
-      format_on_save = {
-        timeout_ms = 500,
-        lsp_fallback = true,
-      },
+      -- format_on_save = {
+      --   timeout_ms = 500,
+      --   lsp_fallback = true,
+      -- },
     })
 
     -- Setup neodev for better Lua development
@@ -413,6 +413,28 @@ return {
         ['<CR>'] = cmp.mapping.confirm({ select = true }),
         ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
         ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+        -- Use <Tab> to select or confirm completion
+        -- ["<Tab>"] = cmp.mapping(function(fallback)
+        --   if cmp.visible() then
+        --     if cmp.get_selected_entry() == nil then
+        --       cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+        --     else
+        --       cmp.confirm({ select = false })
+        --     end
+        --   else
+        --     fallback()
+        --   end
+        -- end, { "i", "s" }),
+
+        -- Use <CR> to confirm selection
+        -- ["<CR>"] = cmp.mapping(function(fallback)
+        --   if cmp.visible() and cmp.get_selected_entry() ~= nil then
+        --     cmp.confirm({ select = false })
+        --   else
+        --     fallback()
+        --   end
+        -- end, { "i", "s" }),
+        --- -----------------------------------------------
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
