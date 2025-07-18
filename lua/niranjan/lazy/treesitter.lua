@@ -126,12 +126,12 @@ return {
                     swap = {
                         enable = true,
                         swap_next = {
-                            ["<leader>a"] = "@parameter.inner",
-                            ["<leader>f"] = "@function.outer",
+                            ["<leader>ao"] = "@parameter.inner",
+                            ["<leader>fo"] = "@function.outer",
                         },
                         swap_previous = {
-                            ["<leader>A"] = "@parameter.inner",
-                            ["<leader>F"] = "@function.outer",
+                            ["<leader>AO"] = "@parameter.inner",
+                            ["<leader>FO"] = "@function.outer",
                         },
                     },
                     move = {
@@ -296,7 +296,7 @@ return {
             })
 
             -- Custom keymaps for context
-            vim.keymap.set("n", "[c", function()
+            vim.keymap.set("n", "<leader>cc", function()
                 require("treesitter-context").go_to_context()
             end, { silent = true, desc = "Go to context" })
         end

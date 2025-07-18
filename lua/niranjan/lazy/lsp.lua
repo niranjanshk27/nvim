@@ -70,8 +70,9 @@ return {
       
       -- Information
       vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))
-      vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
-      vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
+      vim.keymap.set("n", "<leader>k", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
+      -- This key if conflicting with treesitter incremental selection.
+      -- vim.keymap.set("i", "<C-s>", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
       
       -- Actions
       vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename Symbol" }))
@@ -92,7 +93,7 @@ return {
       end, vim.tbl_extend("force", opts, { desc = "List Workspace Folders" }))
       
       -- Formatting
-      vim.keymap.set("n", "<leader>f", function()
+      vim.keymap.set("n", "<leader>fd", function()
         vim.lsp.buf.format({ async = true })
       end, vim.tbl_extend("force", opts, { desc = "Format Document" }))
       
