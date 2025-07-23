@@ -6,7 +6,7 @@
 
 # 1. Create a file nvim.conf in '/etc/newsyslog.d/nvim.conf'
 # 2. Past the below code:
-# /Users/niranjanshk/.local/state/nvim/lsp.log 644 0 1000 * Z /Users/niranjanshk/.config/nvim/dummy.pid 1 /Users/niranjanshk/.config/nvim/scripts/fix-perms.sh
+# /Users/niranjanshk/.local/state/nvim/lsp.log niranjanshk:staff 644 0 * 1 Z 
 #
 # # # # # # # # # # #
 
