@@ -131,7 +131,7 @@ return {
         markdown = { "prettier" },
         go = { "gofmt" },
         rust = { "rustfmt" },
-        ruby = { "rubocop" },
+        ruby = { "rubocop" }, -- Updated for better Ruby formatting
         terraform = { "terraform_fmt" },
       },
       -- format_on_save = {
@@ -186,7 +186,7 @@ return {
         "gopls",
         "ts_ls",
         "pylsp",
-        "ruby_lsp",
+        "solargraph",
         "tflint",
         "jsonls",
         "terraformls",
@@ -194,7 +194,7 @@ return {
         "bashls",
         "cssls",
         "html",
-        "marksman", -- markdown
+        "marksman",
       },
       automatic_installation = true,
       handlers = {
@@ -322,13 +322,52 @@ return {
           })
         end,
         
-        ["ruby_lsp"] = function()
+        ["solargraph"] = function()
           local lspconfig = require("lspconfig")
-          lspconfig.ruby_lsp.setup({
+          lspconfig.solargraph.setup({
             capabilities = capabilities,
             on_attach = on_attach,
-            filetypes = { "ruby", "Fastfile" },
-            root_dir = lspconfig.util.root_pattern("Gemfile", ".git", "Fastfile"),
+            cmd = { "solargraph", "stdio" },
+            filetypes = { "ruby", "eruby" },
+            root_dir = lspconfig.util.root_pattern("Gemfile", ".git"),
+            settings = {
+              solargraph = {
+                -- Core functionality
+                diagnostics = true,
+                completion = true,
+                hover = true,
+                signatureHelp = true,
+                definitions = true,
+                references = true,
+                symbols = true,
+                folding = true,
+                
+                -- Performance and behavior
+                autoformat = false, -- Let conform.nvim handle formatting
+                logLevel = "warn",
+                useBundler = true,
+                bundlerPath = "bundle",
+                
+                -- Advanced settings
+                checkGemVersion = false, -- Disable if causing issues
+                commandPath = "solargraph",
+                pathMethods = true,
+                
+                -- Completion settings
+                completion = {
+                  workspaceSymbols = true,
+                  workspaceSymbolsLimit = 100,
+                },
+                
+                -- Hover settings
+                hover = {
+                  border = "rounded",
+                },
+              }
+            },
+            init_options = {
+              formatting = false,
+            },
           })
         end,
         
