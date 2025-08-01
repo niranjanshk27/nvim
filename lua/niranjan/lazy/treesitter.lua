@@ -20,7 +20,8 @@ return {
                     -- Scripting
                     "lua", "python", "bash", "fish",
                     -- Markup and documentation
-                    "markdown", "markdown_inline", "latex", "bibtex", "rst",
+                    "markdown", "markdown_inline", "bibtex", "rst",
+                    -- "latex"
                     -- Configuration
                     "yaml", "toml", "dockerfile", "terraform", "hcl",
                     -- Documentation
