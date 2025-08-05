@@ -133,6 +133,8 @@ return {
         rust = { "rustfmt" },
         ruby = { "rubocop" }, -- Updated for better Ruby formatting
         terraform = { "terraform_fmt" },
+        -- Ansible formatting
+        ansible = { "ansible-lint" },
       },
       -- format_on_save = {
       --   timeout_ms = 500,
@@ -195,6 +197,7 @@ return {
         "cssls",
         "html",
         "marksman",
+        "ansiblels"
       },
       automatic_installation = true,
       handlers = {
@@ -370,6 +373,46 @@ return {
             },
           })
         end,
+
+        ["ansiblels"] = function()
+          local lspconfig = require("lspconfig")
+          lspconfig.ansiblels.setup({
+            capabilities = capabilities,
+            on_attach = on_attach,
+            cmd = { "ansible-language-server", "--stdio" },
+            filetypes = { "yaml.ansible", "ansible" },
+            root_dir = lspconfig.util.root_pattern("ansible.cfg", ".ansible-lint", "playbook*.yml", "site.yml", "main.yml", "inventory", "group_vars", "host_vars"),
+            single_file_support = true,
+            settings = {
+              ansible = {
+                ansible = {
+                  path = "ansible", -- Path to ansible executable
+                  useFullyQualifiedCollectionNames = true,
+                },
+                ansibleLint = {
+                  enabled = true,
+                  path = "ansible-lint", -- Path to ansible-lint executable
+                },
+                executionEnvironment = {
+                  enabled = false, -- Set to true if using ansible execution environments
+                },
+                python = {
+                  interpreterPath = "python3", -- Path to python interpreter
+                },
+                validation = {
+                  enabled = true,
+                  lint = {
+                    enabled = true,
+                  },
+                },
+                completion = {
+                  provideRedirectModules = true,
+                  provideModuleOptionAliases = true,
+                },
+              },
+            },
+          })
+        end,
         
         ["jsonls"] = function()
           local lspconfig = require("lspconfig")
@@ -397,6 +440,10 @@ return {
                 schemas = {
                   ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] = "/*.k8s.yaml",
                   ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "/*docker-compose*.yml",
+                  -- Ansible schemas
+                  ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json"] = "/*playbook*.yml",
+                  ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json"] = "/tasks/*.yml",
+                  ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json"] = "/vars/*.yml",
                 },
               },
             },
@@ -572,6 +619,40 @@ return {
         }
         vim.diagnostic.open_float(nil, opts)
       end
+    })
+
+    -- Ansible-specific file type detection and configuration
+    vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+      pattern = {
+        "*/playbooks/*.yml",
+        "*/playbooks/*.yaml", 
+        "*playbook*.yml",
+        "*playbook*.yaml",
+        "*/roles/*/tasks/*.yml",
+        "*/roles/*/tasks/*.yaml",
+        "*/roles/*/handlers/*.yml", 
+        "*/roles/*/handlers/*.yaml",
+        "*/group_vars/*",
+        "*/host_vars/*",
+        "site.yml",
+        "site.yaml",
+        "main.yml",
+        "main.yaml"
+      },
+      callback = function()
+        vim.bo.filetype = "yaml.ansible"
+      end,
+    })
+
+    -- Set up ansible-specific settings
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "yaml.ansible",
+      callback = function()
+        vim.bo.shiftwidth = 2
+        vim.bo.tabstop = 2
+        vim.bo.softtabstop = 2
+        vim.bo.expandtab = true
+      end,
     })
   end,
 }
