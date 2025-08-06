@@ -57,65 +57,81 @@ return {
       }
     )
     
-    -- Enhanced LSP keymaps with more features
-    local on_attach = function(client, bufnr)
-      local opts = { noremap = true, silent = true, buffer = bufnr }
-      
-      -- Navigation
-      vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Goto Definition" }))
-      vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Goto Declaration" }))
-      vim.keymap.set("n", "gi", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Goto Implementation" }))
-      vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Goto Type Definition" }))
-      vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
-      
-      -- Information
-      vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))
-      vim.keymap.set("n", "<leader>k", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
-      -- This key if conflicting with treesitter incremental selection.
-      -- vim.keymap.set("i", "<C-s>", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
-      
-      -- Actions
-      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename Symbol" }))
-      vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code Action" }))
-      vim.keymap.set("v", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code Action" }))
-      
-      -- Diagnostics
-      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous Diagnostic" }))
-      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next Diagnostic" }))
-      vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Show Diagnostics" }))
-      vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, vim.tbl_extend("force", opts, { desc = "Diagnostic List" }))
-      
-      -- Workspace
-      vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, vim.tbl_extend("force", opts, { desc = "Add Workspace Folder" }))
-      vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, vim.tbl_extend("force", opts, { desc = "Remove Workspace Folder" }))
-      vim.keymap.set("n", "<leader>wl", function()
-        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-      end, vim.tbl_extend("force", opts, { desc = "List Workspace Folders" }))
-      
-      -- Formatting
-      vim.keymap.set("n", "<leader>fd", function()
-        vim.lsp.buf.format({ async = true })
-      end, vim.tbl_extend("force", opts, { desc = "Format Document" }))
-      
-      -- Performance: disable semantic tokens for large files
-      if client.server_capabilities.semanticTokensProvider then
-        local file_size = vim.fn.getfsize(vim.api.nvim_buf_get_name(bufnr))
-        if file_size > 100000 then -- 100KB
-          client.server_capabilities.semanticTokensProvider = nil
+    -- MODERN APPROACH: Use LspAttach autocmd instead of on_attach function
+    vim.api.nvim_create_autocmd('LspAttach', {
+      group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+      callback = function(ev)
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        print("LSP attached: " .. client.name .. " to buffer: " .. ev.buf)
+        
+        local opts = { buffer = ev.buf }
+        
+        -- Navigation
+        vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Goto Definition" }))
+        vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Goto Declaration" }))
+        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Goto Implementation" }))
+        vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Goto Type Definition" }))
+        vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
+        
+        -- Information
+        vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))
+        vim.keymap.set("n", "<leader>k", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
+        
+        -- Actions
+        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename Symbol" }))
+        vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code Action" }))
+        vim.keymap.set("v", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code Action" }))
+        
+        -- Diagnostics
+        vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous Diagnostic" }))
+        vim.keymap.set("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next Diagnostic" }))
+        vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Show Diagnostics" }))
+        vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, vim.tbl_extend("force", opts, { desc = "Diagnostic List" }))
+
+        -- Copy diagnostic message to clipboard
+        vim.keymap.set("n", "<leader>yy", function()
+          local diagnostics = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
+          if #diagnostics > 0 then
+            local message = diagnostics[1].message
+            vim.fn.setreg('+', message)
+            print("Copied diagnostic: " .. message)
+          else
+            print("No diagnostic on current line")
+          end
+        end, vim.tbl_extend("force", opts, { desc = "Copy Diagnostic Message" }))
+        
+        -- Workspace
+        vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, vim.tbl_extend("force", opts, { desc = "Add Workspace Folder" }))
+        vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, vim.tbl_extend("force", opts, { desc = "Remove Workspace Folder" }))
+        vim.keymap.set("n", "<leader>wl", function()
+          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, vim.tbl_extend("force", opts, { desc = "List Workspace Folders" }))
+        
+        -- Formatting
+        vim.keymap.set("n", "<leader>fd", function()
+          vim.lsp.buf.format({ async = true })
+        end, vim.tbl_extend("force", opts, { desc = "Format Document" }))
+        
+        -- Performance: disable semantic tokens for large files
+        if client.server_capabilities.semanticTokensProvider then
+          local file_size = vim.fn.getfsize(vim.api.nvim_buf_get_name(ev.buf))
+          if file_size > 100000 then -- 100KB
+            client.server_capabilities.semanticTokensProvider = nil
+          end
         end
-      end
-      
-      -- Auto-format on save (optional - uncomment if desired)
-      -- if client.server_capabilities.documentFormattingProvider then
-      --   vim.api.nvim_create_autocmd("BufWritePre", {
-      --     group = vim.api.nvim_create_augroup("LspFormat", {}),
-      --     buffer = bufnr,
-      --     callback = function()
-      --       vim.lsp.buf.format({ async = false })
-      --     end,
-      --   })
-      -- end
-    end
+        
+        -- Auto-format on save (optional - uncomment if desired)
+        -- if client.server_capabilities.documentFormattingProvider then
+        --   vim.api.nvim_create_autocmd("BufWritePre", {
+        --     group = vim.api.nvim_create_augroup("LspFormat", {}),
+        --     buffer = ev.buf,
+        --     callback = function()
+        --       vim.lsp.buf.format({ async = false })
+        --     end,
+        --   })
+        -- end
+      end,
+    })
 
     -- Enhanced conform setup with more formatters
     require("conform").setup({
@@ -135,6 +151,10 @@ return {
         terraform = { "terraform_fmt" },
         -- Ansible formatting
         ansible = { "ansible-lint" },
+        -- Jinja formatting
+        jinja = { "djlint" },
+        html = { "djlint", "prettier" },
+        htmldjango = { "djlint" },
       },
       -- format_on_save = {
       --   timeout_ms = 500,
@@ -197,14 +217,16 @@ return {
         "cssls",
         "html",
         "marksman",
-        "ansiblels"
+        "ansiblels",
+        "jinja_lsp",
       },
       automatic_installation = true,
       handlers = {
+        -- Default handler (will be called for servers without specific handlers)
         function(server_name)
           require("lspconfig")[server_name].setup({
             capabilities = capabilities,
-            on_attach = on_attach,
+            -- Removed on_attach since we use LspAttach autocmd
           })
         end,
         
@@ -212,7 +234,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.lua_ls.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               Lua = {
                 completion = {
@@ -244,7 +265,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.rust_analyzer.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               ["rust-analyzer"] = {
                 checkOnSave = {
@@ -273,7 +293,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.gopls.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               gopls = {
                 analyses = {
@@ -290,7 +309,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.ts_ls.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               typescript = {
                 inlayHints = {
@@ -311,7 +329,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.pylsp.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               pylsp = {
                 plugins = {
@@ -329,7 +346,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.solargraph.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             cmd = { "solargraph", "stdio" },
             filetypes = { "ruby", "eruby" },
             root_dir = lspconfig.util.root_pattern("Gemfile", ".git"),
@@ -378,7 +394,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.ansiblels.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             cmd = { "ansible-language-server", "--stdio" },
             filetypes = { "yaml.ansible", "ansible" },
             root_dir = lspconfig.util.root_pattern("ansible.cfg", ".ansible-lint", "playbook*.yml", "site.yml", "main.yml", "inventory", "group_vars", "host_vars"),
@@ -413,13 +428,51 @@ return {
             },
           })
         end,
+
+        ["jinja_lsp"] = function()
+          local lspconfig = require("lspconfig")
+          lspconfig.jinja_lsp.setup({
+            capabilities = capabilities,
+            cmd = { "jinja-lsp" },
+            filetypes = { "jinja", "jinja2", "j2", "html.jinja", "htmldjango", "html.j2" },
+            root_dir = lspconfig.util.root_pattern(".git", "templates", "template"),
+            single_file_support = true,
+            settings = {
+              jinja = {
+                -- Enable syntax highlighting
+                highlight = {
+                  enabled = true,
+                },
+                -- Enable completion
+                completion = {
+                  enabled = true,
+                  -- Add custom functions/filters if needed
+                  customFunctions = {},
+                  customFilters = {},
+                },
+                -- Enable hover documentation
+                hover = {
+                  enabled = true,
+                },
+                -- Diagnostics settings
+                diagnostics = {
+                  enabled = true,
+                },
+                -- Template path settings
+                templates = {
+                  -- Add paths where templates are located
+                  paths = { "templates/", "template/", "./", "src/templates/" },
+                },
+              },
+            },
+          })
+        end,
         
         ["jsonls"] = function()
           local lspconfig = require("lspconfig")
           local schemastore = require("schemastore")
           lspconfig.jsonls.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               json = {
                 schemas = schemastore.json.schemas(),
@@ -434,7 +487,6 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.yamlls.setup({
             capabilities = capabilities,
-            on_attach = on_attach,
             settings = {
               yaml = {
                 schemas = {
@@ -462,7 +514,6 @@ return {
               },
             },
             capabilities = capabilities,
-            on_attach = on_attach
           })
           vim.g.zig_fmt_parse_errors = 0
           vim.g.zig_fmt_autosave = 0
@@ -652,6 +703,42 @@ return {
         vim.bo.tabstop = 2
         vim.bo.softtabstop = 2
         vim.bo.expandtab = true
+      end,
+    })
+
+    -- Jinja-specific file type detection and configuration
+    vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+      pattern = {
+        "*.jinja",
+        "*.jinja2",
+        "*.j2",
+        "*.html.jinja",
+        "*.html.j2",
+        "*/templates/*.html",
+        "*/template/*.html",
+      },
+      callback = function()
+        local filename = vim.fn.expand("%:t")
+        if filename:match("%.html%.jinja$") or filename:match("%.html%.j2$") then
+          vim.bo.filetype = "htmldjango"
+        elseif filename:match("%.html$") and (vim.fn.expand("%:p"):match("/templates/") or vim.fn.expand("%:p"):match("/template/")) then
+          vim.bo.filetype = "htmldjango"
+        else
+          vim.bo.filetype = "jinja"
+        end
+      end,
+    })
+
+    -- Set up jinja-specific settings
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = {"jinja", "jinja2", "htmldjango"},
+      callback = function()
+        vim.bo.shiftwidth = 2
+        vim.bo.tabstop = 2
+        vim.bo.softtabstop = 2
+        vim.bo.expandtab = true
+        -- Enable better syntax highlighting for Jinja templates
+        vim.cmd("setlocal commentstring={#\\ %s\\ #}")
       end,
     })
   end,
