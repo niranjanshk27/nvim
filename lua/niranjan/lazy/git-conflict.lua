@@ -6,7 +6,7 @@ return {
       default_mappings = true, -- Keep default mappings: co (ours), ct (theirs), cb (both), c0 (none)
       default_commands = true, -- Keep default commands
       disable_diagnostics = false, -- Keep diagnostics visible during conflicts
-      list_opener = 'copen', -- Use quickfix list to show all conflicts
+      list_opener = 'Telescope quickfix', -- Use Telescope to show conflicts
       
       -- Enhanced highlights for better visual distinction
       highlights = {
@@ -28,7 +28,15 @@ return {
 
     -- Custom keymaps for enhanced workflow
     local keymap = vim.keymap.set
-    keymap('n', '<leader>gl', '<cmd>GitConflictListQf<cr>', { desc = 'List git conflicts in quickfix' })
+    keymap('n', '<leader>gl', function()
+      -- First populate quickfix with conflicts, then open in telescope with clean input
+      vim.cmd('GitConflictListQf')
+      vim.schedule(function()
+        require('telescope.builtin').quickfix({
+          prompt_title = "Git Conflicts",
+        })
+      end)
+    end, { desc = 'List git conflicts in Telescope' })
     keymap('n', '[x', '<cmd>GitConflictPrevConflict<cr>', { desc = 'Previous conflict' })
     keymap('n', ']x', '<cmd>GitConflictNextConflict<cr>', { desc = 'Next conflict' })
     
