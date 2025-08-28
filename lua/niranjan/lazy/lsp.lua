@@ -62,7 +62,7 @@ return {
       group = vim.api.nvim_create_augroup('UserLspConfig', {}),
       callback = function(ev)
         local client = vim.lsp.get_client_by_id(ev.data.client_id)
-        print("LSP attached: " .. client.name .. " to buffer: " .. ev.buf)
+        -- print("LSP attached: " .. client.name .. " to buffer: " .. ev.buf)
         
         local opts = { buffer = ev.buf }
         
@@ -545,8 +545,8 @@ return {
       mapping = cmp.mapping.preset.insert({
         ['<C-b>'] = cmp.mapping.scroll_docs(-4),
         ['<C-f>'] = cmp.mapping.scroll_docs(4),
-        ['<C-Space>'] = cmp.mapping.complete(),
-        ['<C-e>'] = cmp.mapping.abort(),
+        ['<M-Space>'] = cmp.mapping.complete(),
+        ['<Esc>'] = cmp.mapping.abort(),
         ['<CR>'] = cmp.mapping.confirm({ select = true }),
         ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
         ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
