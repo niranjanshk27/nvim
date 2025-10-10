@@ -207,7 +207,7 @@ return {
         "rust_analyzer",
         "gopls",
         "ts_ls",
-        "pylsp",
+        "pyright",
         "solargraph",
         "tflint",
         "jsonls",
@@ -219,6 +219,7 @@ return {
         "marksman",
         "ansiblels",
         "jinja_lsp",
+        "dockerls"
       },
       automatic_installation = true,
       handlers = {
@@ -325,17 +326,16 @@ return {
           })
         end,
         
-        ["pylsp"] = function()
+        ["pyright"] = function()
           local lspconfig = require("lspconfig")
-          lspconfig.pylsp.setup({
+          lspconfig.pyright.setup({
             capabilities = capabilities,
             settings = {
-              pylsp = {
-                plugins = {
-                  pycodestyle = {
-                    ignore = {'W391'},
-                    maxLineLength = 100
-                  }
+              python = {
+                analysis = {
+                  autoSearchPaths = true,
+                  useLibraryCodeForTypes = true,
+                  diagnosticMode = "workspace"
                 }
               }
             }
@@ -490,7 +490,7 @@ return {
             settings = {
               yaml = {
                 schemas = {
-                  ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] = "/*.k8s.yaml",
+                  kubernetes = "/*.k8s.yaml",
                   ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "/*docker-compose*.yml",
                   -- Ansible schemas
                   ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json"] = "/*playbook*.yml",

@@ -27,6 +27,7 @@ return {
       buf_options = {
         buflisted = false,
         bufhidden = "hide",
+        buftype = "",
       },
       
       -- Window-local options to use for oil buffers
@@ -97,15 +98,15 @@ return {
         ["g\\"] = "actions.toggle_trash",
         
         -- Custom keymaps
-        ["<leader>ff"] = "actions.select",
-        ["<leader>fv"] = { "actions.select", opts = { vertical = true } },
-        ["<leader>fh"] = { "actions.select", opts = { horizontal = true } },
-        ["<leader>ft"] = { "actions.select", opts = { tab = true } },
-        ["<leader>fp"] = "actions.preview",
-        ["<leader>fr"] = "actions.refresh",
-        ["<leader>fu"] = "actions.parent",
-        ["<leader>fd"] = "actions.cd",
-        ["<leader>fq"] = "actions.close",
+        -- ["<leader>ff"] = "actions.select",
+        -- ["<leader>fv"] = { "actions.select", opts = { vertical = true } },
+        -- ["<leader>fh"] = { "actions.select", opts = { horizontal = true } },
+        -- ["<leader>ft"] = { "actions.select", opts = { tab = true } },
+        -- ["<leader>fp"] = "actions.preview",
+        -- ["<leader>fr"] = "actions.refresh",
+        -- ["<leader>fu"] = "actions.parent",
+        -- ["<leader>fd"] = "actions.cd",
+        -- ["<leader>fq"] = "actions.close",
         
         -- Yank operations
         ["yy"] = "actions.copy_entry_path",

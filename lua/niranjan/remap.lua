@@ -31,3 +31,12 @@ vim.keymap.set("n", "<C-i>", ":bprevious<CR>", { desc = "Previous buffer", norem
 
 -- leader + s to save the file.
 -- vim.keymap.set('n', '<leader>s', ':w<CR>', { noremap = true, silent = true, desc = "Save file" })
+
+-- Snacks keymaps
+-- vim.keymap.set("n", "<leader>ps", builtin.find_files, {})
+-- vim.keymap.set("n", "<leader>pg", builtin.live_grep, {})
+
+-- Seach and replace project wise
+-- <leader>fq and search for what you want to replace
+-- send it to quickfix list <C-Q>
+-- :cfdo %s/search_word/replace_word/g | update | bd
