@@ -9,6 +9,7 @@ return {
       highlight = "IblIndent",
       smart_indent_cap = true,
       priority = 2,
+      repeat_linebreak = false,
     },
     whitespace = {
       highlight = "IblWhitespace",
@@ -43,15 +44,11 @@ return {
         "lazyterm",
         "NvimTree",
         "oil",
-        "TelescopePrompt",
-        "TelescopeResults",
         "lspinfo",
         "packer",
         "checkhealth",
         "man",
         "gitcommit",
-        "TelescopePrompt",
-        "TelescopeResults",
         "''",
       },
       buftypes = {
@@ -64,15 +61,14 @@ return {
   },
   config = function(_, opts)
     require("ibl").setup(opts)
-    
     -- Custom highlights for better visual distinction
-    local hooks = require("ibl.hooks")
-    hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-      vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3b4261", nocombine = true })
-      vim.api.nvim_set_hl(0, "IblScope", { fg = "#7c3aed", nocombine = true })
-      vim.api.nvim_set_hl(0, "IblWhitespace", { fg = "#2d3748", nocombine = true })
-    end)
-    
+    -- local hooks = require("ibl.hooks")
+    -- hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+    --   vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3b4261", nocombine = true })
+    --   vim.api.nvim_set_hl(0, "IblScope", { fg = "#7c3aed", nocombine = true })
+    --   vim.api.nvim_set_hl(0, "IblWhitespace", { fg = "#2d3748", nocombine = true })
+    -- end)
+
     -- Optional: Rainbow indent guides (uncomment if you want colorful indents)
     -- hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
     --   vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
@@ -83,7 +79,6 @@ return {
     --   vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
     --   vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
     -- end)
-    
     -- hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
   end,
 }

@@ -1,8 +1,11 @@
 return {
     {
         "nvim-treesitter/nvim-treesitter",
+        event = "BufReadPost",
+        cmd = { "TSUpdate" },
         build = ":TSUpdate",
         dependencies = {
+            "nvim-lua/plenary.nvim",
             "nvim-treesitter/nvim-treesitter-textobjects",
             "nvim-treesitter/nvim-treesitter-context",
             "nvim-treesitter/nvim-treesitter-refactor",
@@ -23,7 +26,7 @@ return {
                     "markdown", "markdown_inline", "bibtex", "rst",
                     -- "latex"
                     -- Configuration
-                    "yaml", "toml", "dockerfile", "terraform", "hcl",
+                    "yaml", "toml", "dockerfile", "terraform", "hcl", "groovy", "hocon", "jq", "ini",
                     -- Documentation
                     "vimdoc", "comment", "jsdoc",
                     -- Data formats
@@ -37,7 +40,7 @@ return {
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
-                sync_install = false,
+                sync_install = true,
 
                 -- Automatically install missing parsers when entering buffer
                 auto_install = true,
