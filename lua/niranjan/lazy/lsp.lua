@@ -32,6 +32,11 @@ return {
     "nvim-tree/nvim-web-devicons", -- icons
     "hrsh7th/cmp-nvim-lsp-signature-help", -- signature help
     "hrsh7th/cmp-nvim-lsp-document-symbol", -- document symbols
+    -- Add typescript-tools.nvim
+    {
+      "pmizio/typescript-tools.nvim",
+      dependencies = { "nvim-lua/plenary.nvim" },
+    },
   },
   config = function()
     -- Performance: reduce LSP log level
@@ -112,6 +117,18 @@ return {
           vim.lsp.buf.format({ async = true })
         end, vim.tbl_extend("force", opts, { desc = "Format Document" }))
         
+        -- TypeScript-specific keymaps (only for typescript-tools)
+        if client.name == "typescript-tools" then
+          vim.keymap.set("n", "<leader>to", "<cmd>TSToolsOrganizeImports<cr>", vim.tbl_extend("force", opts, { desc = "Organize Imports" }))
+          vim.keymap.set("n", "<leader>ts", "<cmd>TSToolsSortImports<cr>", vim.tbl_extend("force", opts, { desc = "Sort Imports" }))
+          vim.keymap.set("n", "<leader>tu", "<cmd>TSToolsRemoveUnusedImports<cr>", vim.tbl_extend("force", opts, { desc = "Remove Unused Imports" }))
+          vim.keymap.set("n", "<leader>ti", "<cmd>TSToolsAddMissingImports<cr>", vim.tbl_extend("force", opts, { desc = "Add Missing Imports" }))
+          vim.keymap.set("n", "<leader>tf", "<cmd>TSToolsFixAll<cr>", vim.tbl_extend("force", opts, { desc = "Fix All" }))
+          vim.keymap.set("n", "<leader>tg", "<cmd>TSToolsGoToSourceDefinition<cr>", vim.tbl_extend("force", opts, { desc = "Go To Source Definition" }))
+          vim.keymap.set("n", "<leader>tr", "<cmd>TSToolsRenameFile<cr>", vim.tbl_extend("force", opts, { desc = "Rename File" }))
+          vim.keymap.set("n", "<leader>ta", "<cmd>TSToolsFileReferences<cr>", vim.tbl_extend("force", opts, { desc = "File References" }))
+        end
+        
         -- Performance: disable semantic tokens for large files
         if client.server_capabilities.semanticTokensProvider then
           local file_size = vim.fn.getfsize(vim.api.nvim_buf_get_name(ev.buf))
@@ -147,11 +164,9 @@ return {
         markdown = { "prettier" },
         go = { "gofmt" },
         rust = { "rustfmt" },
-        ruby = { "rubocop" }, -- Updated for better Ruby formatting
+        ruby = { "rubocop" },
         terraform = { "terraform_fmt" },
-        -- Ansible formatting
         ansible = { "ansible-lint" },
-        -- Jinja formatting
         jinja = { "djlint" },
         html = { "djlint", "prettier" },
         htmldjango = { "djlint" },
@@ -206,7 +221,7 @@ return {
         "lua_ls",
         "rust_analyzer",
         "gopls",
-        "ts_ls",
+        -- REMOVED: "ts_ls", -- Using typescript-tools.nvim instead
         "pyright",
         "solargraph",
         "tflint",
@@ -227,7 +242,6 @@ return {
         function(server_name)
           require("lspconfig")[server_name].setup({
             capabilities = capabilities,
-            -- Removed on_attach since we use LspAttach autocmd
           })
         end,
         
@@ -306,25 +320,7 @@ return {
           })
         end,
         
-        ["ts_ls"] = function()
-          local lspconfig = require("lspconfig")
-          lspconfig.ts_ls.setup({
-            capabilities = capabilities,
-            settings = {
-              typescript = {
-                inlayHints = {
-                  includeInlayParameterNameHints = 'all',
-                  includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                  includeInlayFunctionParameterTypeHints = true,
-                  includeInlayVariableTypeHints = true,
-                  includeInlayPropertyDeclarationTypeHints = true,
-                  includeInlayFunctionLikeReturnTypeHints = true,
-                  includeInlayEnumMemberValueHints = true,
-                }
-              }
-            }
-          })
-        end,
+        -- REMOVED: ts_ls handler - Using typescript-tools.nvim instead
         
         ["pyright"] = function()
           local lspconfig = require("lspconfig")
@@ -351,7 +347,6 @@ return {
             root_dir = lspconfig.util.root_pattern("Gemfile", ".git"),
             settings = {
               solargraph = {
-                -- Core functionality
                 diagnostics = true,
                 completion = true,
                 hover = true,
@@ -360,25 +355,17 @@ return {
                 references = true,
                 symbols = true,
                 folding = true,
-                
-                -- Performance and behavior
-                autoformat = false, -- Let conform.nvim handle formatting
+                autoformat = false,
                 logLevel = "warn",
                 useBundler = true,
                 bundlerPath = "bundle",
-                
-                -- Advanced settings
-                checkGemVersion = false, -- Disable if causing issues
+                checkGemVersion = false,
                 commandPath = "solargraph",
                 pathMethods = true,
-                
-                -- Completion settings
                 completion = {
                   workspaceSymbols = true,
                   workspaceSymbolsLimit = 100,
                 },
-                
-                -- Hover settings
                 hover = {
                   border = "rounded",
                 },
@@ -401,18 +388,18 @@ return {
             settings = {
               ansible = {
                 ansible = {
-                  path = "ansible", -- Path to ansible executable
+                  path = "ansible",
                   useFullyQualifiedCollectionNames = true,
                 },
                 ansibleLint = {
                   enabled = true,
-                  path = "ansible-lint", -- Path to ansible-lint executable
+                  path = "ansible-lint",
                 },
                 executionEnvironment = {
-                  enabled = false, -- Set to true if using ansible execution environments
+                  enabled = false,
                 },
                 python = {
-                  interpreterPath = "python3", -- Path to python interpreter
+                  interpreterPath = "python3",
                 },
                 validation = {
                   enabled = true,
@@ -439,28 +426,21 @@ return {
             single_file_support = true,
             settings = {
               jinja = {
-                -- Enable syntax highlighting
                 highlight = {
                   enabled = true,
                 },
-                -- Enable completion
                 completion = {
                   enabled = true,
-                  -- Add custom functions/filters if needed
                   customFunctions = {},
                   customFilters = {},
                 },
-                -- Enable hover documentation
                 hover = {
                   enabled = true,
                 },
-                -- Diagnostics settings
                 diagnostics = {
                   enabled = true,
                 },
-                -- Template path settings
                 templates = {
-                  -- Add paths where templates are located
                   paths = { "templates/", "template/", "./", "src/templates/" },
                 },
               },
@@ -492,7 +472,6 @@ return {
                 schemas = {
                   kubernetes = "/*.k8s.yaml",
                   ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "/*docker-compose*.yml",
-                  -- Ansible schemas
                   ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json"] = "/*playbook*.yml",
                   ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json"] = "/tasks/*.yml",
                   ["https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json"] = "/vars/*.yml",
@@ -519,6 +498,55 @@ return {
           vim.g.zig_fmt_autosave = 0
         end,
       }
+    })
+
+    -- Setup typescript-tools.nvim (replaces ts_ls)
+    require("typescript-tools").setup({
+      capabilities = capabilities,
+      settings = {
+        separate_diagnostic_server = true,
+        publish_diagnostic_on = "insert_leave",
+        expose_as_code_action = "all",
+        tsserver_path = nil,
+        tsserver_plugins = {},
+        tsserver_max_memory = "auto",
+        tsserver_format_options = {
+          insertSpaceAfterCommaDelimiter = true,
+          insertSpaceAfterSemicolonInForStatements = true,
+          insertSpaceBeforeAndAfterBinaryOperators = true,
+          insertSpaceAfterKeywordsInControlFlowStatements = true,
+          insertSpaceAfterFunctionKeywordForAnonymousFunctions = true,
+          insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis = false,
+          insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets = false,
+          insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces = true,
+          insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces = false,
+          insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces = false,
+          insertSpaceBeforeFunctionParenthesis = false,
+          placeOpenBraceOnNewLineForFunctions = false,
+          placeOpenBraceOnNewLineForControlBlocks = false,
+        },
+        tsserver_file_preferences = {
+          includeInlayParameterNameHints = "all",
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+          importModuleSpecifierPreference = "non-relative",
+          quotePreference = "auto",
+        },
+        tsserver_locale = "en",
+        complete_function_calls = false,
+        include_completions_with_insert_text = true,
+        code_lens = "off",
+        disable_member_code_lens = true,
+        jsx_close_tag = {
+          enable = false,
+          filetypes = { "javascriptreact", "typescriptreact" },
+        },
+      },
     })
 
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -737,7 +765,6 @@ return {
         vim.bo.tabstop = 2
         vim.bo.softtabstop = 2
         vim.bo.expandtab = true
-        -- Enable better syntax highlighting for Jinja templates
         vim.cmd("setlocal commentstring={#\\ %s\\ #}")
       end,
     })

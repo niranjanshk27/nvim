@@ -26,7 +26,7 @@ return {
       -- Default states for showing different file types
       hidden = false,       -- Hide hidden files by default
       follow = true,        -- Follow cursor in real-time
-      ignored = true,       -- Show ignored files (gitignored, etc.) by default
+      ignored = false,       -- Show ignored files (gitignored, etc.) by default
       -- Ivy layout with bottom position
       layout = { 
         preset = "ivy", 
@@ -103,10 +103,8 @@ return {
   },
   keys = {
     -- File pickers with explicit options
-    { "<leader>ff", function() Snacks.picker.files({ hidden = true, ignored = true }) end, desc = "Find Files (All)" },
-    -- { "<leader>fF", function() Snacks.picker.files({ hidden = false, ignored = false }) end, desc = "Find Files (Filtered)" },
+    { "<leader>ff", function() Snacks.picker.files() end, desc = "Find Files (All)" },
     { "<leader>fg", function() Snacks.picker.grep({ hidden = true, ignored = true }) end, desc = "Live Grep (All)" },
-    -- { "<leader>fG", function() Snacks.picker.grep({ hidden = false, ignored = false }) end, desc = "Live Grep (Filtered)" },
     { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Find Buffers" },
     { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent Files" },
     { "<leader>fh", function() Snacks.picker.help() end, desc = "Help Tags" },
@@ -114,44 +112,18 @@ return {
     { "<leader>fk", function() Snacks.picker.keymaps() end, desc = "Keymaps" },
     -- Specialized file pickers
     { "<leader>f.", function() Snacks.picker.files({ hidden = true, ignored = false, cwd = vim.fn.expand("~") }) end, desc = "Find Dotfiles" },
-    -- { "<leader>fA", function() Snacks.picker.files({ hidden = true, ignored = true, follow = false }) end, desc = "Find All Files (No Follow)" },
-    
-    -- Git pickers
-    -- { "<leader>gc", function() Snacks.picker.git_commits() end, desc = "Git Commits" },
-    -- { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
-    -- { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
-    
     -- LSP pickers
     { "<leader>lr", function() Snacks.picker.lsp_references() end, desc = "LSP References" },
     { "<leader>ld", function() Snacks.picker.lsp_definitions() end, desc = "LSP Definitions" },
     { "<leader>li", function() Snacks.picker.lsp_implementations() end, desc = "LSP Implementations" },
     { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
     { "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
-    
     -- Other useful pickers
     { "<leader>fc", function() Snacks.picker.commands() end, desc = "Commands" },
     { "<leader>fO", function() Snacks.picker.vim_options() end, desc = "Vim Options" },
     { "<leader>ft", function() Snacks.picker.colorschemes() end, desc = "Colorschemes" },
-    
     -- Search in current buffer
     { "<leader>/", function() Snacks.picker.lines() end, desc = "Search Lines" },
-    
-    -- Quick toggle keymaps for global picker state
-    -- { "<leader>th", function() 
-    --     local current = Snacks.picker.config.hidden
-    --     Snacks.picker.config.hidden = not current
-    --     vim.notify("Hidden files: " .. (not current and "shown" or "hidden"))
-    --   end, desc = "Toggle Hidden Files Globally" },
-    -- { "<leader>ti", function() 
-    --     local current = Snacks.picker.config.ignored
-    --     Snacks.picker.config.ignored = not current
-    --     vim.notify("Ignored files: " .. (not current and "shown" or "hidden"))
-    --   end, desc = "Toggle Ignored Files Globally" },
-    -- { "<leader>tf", function() 
-    --     local current = Snacks.picker.config.follow
-    --     Snacks.picker.config.follow = not current
-    --     vim.notify("Follow cursor: " .. (not current and "enabled" or "disabled"))
-    --   end, desc = "Toggle Follow Cursor Globally" },
   },
   init = function()
     vim.api.nvim_create_autocmd("User", {
