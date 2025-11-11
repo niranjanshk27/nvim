@@ -1,4 +1,8 @@
 return {
+  cmd = { "ansible-language-server", "--stdio" },
+  filetypes = { "yaml.ansible", "ansible" },
+  -- root_dir = lspconfig.util.root_pattern("ansible.cfg", ".ansible-lint", "playbook*.yml", "site.yml", "main.yml", "inventory", "group_vars", "host_vars"),
+  single_file_support = true,
   settings = {
     ansible = {
       ansible = {

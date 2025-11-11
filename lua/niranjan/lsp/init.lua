@@ -9,6 +9,7 @@ function M.get_capabilities()
     vim.lsp.protocol.make_client_capabilities(),
     cmp_lsp.default_capabilities()
   )
+  -- Performance: configure capabilities
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { "documentation", "detail", "additionalTextEdits" },
@@ -27,6 +28,17 @@ function M.on_attach(client, buffer)
       client.server_capabilities.semanticTokensProvider = nil
     end
   end
+
+  -- Auto-format on save (optional - uncomment if desired)
+  -- if client.server_capabilities.documentFormattingProvider then
+  --   vim.api.nvim_create_autocmd("BufWritePre", {
+  --     group = vim.api.nvim_create_augroup("LspFormat", {}),
+  --     buffer = ev.buf,
+  --     callback = function()
+  --       vim.lsp.buf.format({ async = false })
+  --     end,
+  --   })
+  -- end
 end
 
 -- This is the main setup function for your LSP configurations.
@@ -79,6 +91,30 @@ function M.setup()
         prefix = ' ',
         scope = 'cursor',
       })
+      vim.diagnostic.open_float(nil, opts)
+    end,
+  })
+
+  -- Set up ansible-specific settings
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "yaml.ansible",
+    callback = function()
+      vim.bo.shiftwidth = 2
+      vim.bo.tabstop = 2
+      vim.bo.softtabstop = 2
+      vim.bo.expandtab = true
+    end,
+  })
+
+  -- Set up jinja-specific settings
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = {"jinja", "jinja2", "htmldjango"},
+    callback = function()
+      vim.bo.shiftwidth = 2
+      vim.bo.tabstop = 2
+      vim.bo.softtabstop = 2
+      vim.bo.expandtab = true
+      vim.cmd("setlocal commentstring={#\\ %s\\ #}")
     end,
   })
 

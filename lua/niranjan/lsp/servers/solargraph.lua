@@ -16,13 +16,13 @@ return {
       checkGemVersion = false,
       commandPath = "solargraph",
       pathMethods = true,
-      completion = {
-        workspaceSymbols = true,
-        workspaceSymbolsLimit = 100,
-      },
-      hover = {
-        border = "rounded",
-      },
+      -- completion = {
+      --   workspaceSymbols = true,
+      --   workspaceSymbolsLimit = 100,
+      -- },
+      -- hover = {
+      --   border = "rounded",
+      -- },
     }
   }
 }

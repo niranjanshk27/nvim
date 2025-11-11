@@ -1,11 +1,14 @@
 return {
+  {
+    "nvim-lua/plenary.nvim",
+    name = "plenary"
+  },
+  {
+    "nvim-tree/nvim-web-devicons",
+    lazy = true,
+  },
 
-    {
-        "nvim-lua/plenary.nvim",
-        name = "plenary"
-    },
-
-    -- "eandrju/cellular-automaton.nvim",
+  -- "eandrju/cellular-automaton.nvim",
 }
 
 

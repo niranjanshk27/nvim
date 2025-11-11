@@ -16,6 +16,7 @@ return {
     "williamboman/mason-lspconfig.nvim",
     "j-hui/fidget.nvim",
     "folke/neodev.nvim",
+    "b0o/schemastore.nvim",
   },
   config = function()
     require("niranjan.lsp").setup()
@@ -26,7 +27,14 @@ return {
         }
       }
     })
-    require("neodev").setup({})
+    require("neodev").setup({
+      library = {
+        enabled = true,
+        runtime = true,
+        types = true,
+        plugins = true,
+      }
+    })
     require("mason").setup({
       ui = {
         border = "rounded"
@@ -47,6 +55,7 @@ return {
 
     -- Setup handlers should be passed to mason_lspconfig.setup, not called separately
     mason_lspconfig.setup({
+      automatic_installation = true,
       ensure_installed = servers,
       handlers = {
         function(server_name)
