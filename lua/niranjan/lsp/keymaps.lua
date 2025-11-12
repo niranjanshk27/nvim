@@ -21,21 +21,37 @@ function M.on_attach(client, buffer)
   keymap("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next Diagnostic" }))
   keymap("n", "<leader>e", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Show Diagnostics" }))
   keymap("n", "<leader>q", vim.diagnostic.setloclist, vim.tbl_extend("force", opts, { desc = "Diagnostics List" }))
+  -- Copy diagnostic messge to system clipboard
+  keymap("n", "<leader>ye", function()
+    local diagnostic = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
+    if #diagnostic > 0 then
+      local message = diagnostic[1].message
+      -- Copy to system clipboard (+ register)
+      vim.fn.setreg('+', message)
+      -- Also copy to primary selection on linux (* register)
+      vim.fn.setreg('*', message)
+    end
+  end, vim.tbl_extend("force", opts, { desc = "Copy Diagnostics to clipboard" }))
   --Formatting
-  keymap("n", "<leader>fd", function ()
+  keymap("n", "<leader>fd", function()
     vim.lsp.buf.format({ async = true })
   end, vim.tbl_extend("force", opts, { desc = "Format Document" }))
 
   -- TypeScript-specific keymaps
   if client.name == "typescript-tools" then
-    keymap("n", "<leader>to", "<cmd>TSToolsOrganizeImports<cr>", vim.tbl_extend("force", opts, { desc = "Organize Imports" }))
+    keymap("n", "<leader>to", "<cmd>TSToolsOrganizeImports<cr>",
+      vim.tbl_extend("force", opts, { desc = "Organize Imports" }))
     keymap("n", "<leader>ts", "<cmd>TSToolsSortImports<cr>", vim.tbl_extend("force", opts, { desc = "Sort Imports" }))
-    keymap("n", "<leader>tu", "<cmd>TSToolsRemoveUnusedImports<cr>", vim.tbl_extend("force", opts, { desc = "Remove Unused Imports" }))
-    keymap("n", "<leader>ti", "<cmd>TSToolsAddMissingImports<cr>", vim.tbl_extend("force", opts, { desc = "Add Missing Imports" }))
+    keymap("n", "<leader>tu", "<cmd>TSToolsRemoveUnusedImports<cr>",
+      vim.tbl_extend("force", opts, { desc = "Remove Unused Imports" }))
+    keymap("n", "<leader>ti", "<cmd>TSToolsAddMissingImports<cr>",
+      vim.tbl_extend("force", opts, { desc = "Add Missing Imports" }))
     keymap("n", "<leader>tf", "<cmd>TSToolsFixAll<cr>", vim.tbl_extend("force", opts, { desc = "Fix All" }))
-    keymap("n", "<leader>tg", "<cmd>TSToolsGoToSourceDefinition<cr>", vim.tbl_extend("force", opts, { desc = "Go To Source Definition" }))
+    keymap("n", "<leader>tg", "<cmd>TSToolsGoToSourceDefinition<cr>",
+      vim.tbl_extend("force", opts, { desc = "Go To Source Definition" }))
     keymap("n", "<leader>tr", "<cmd>TSToolsRenameFile<cr>", vim.tbl_extend("force", opts, { desc = "Rename File" }))
-    keymap("n", "<leader>ta", "<cmd>TSToolsFileReferences<cr>", vim.tbl_extend("force", opts, { desc = "File References" }))
+    keymap("n", "<leader>ta", "<cmd>TSToolsFileReferences<cr>",
+      vim.tbl_extend("force", opts, { desc = "File References" }))
   end
 end
 
