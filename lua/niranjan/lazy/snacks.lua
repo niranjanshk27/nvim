@@ -18,18 +18,18 @@ return {
       scores = true,
     },
     -- Enhanced matcher for better performance
-    matcher = { 
+    matcher = {
       frecency = true,
     },
     picker = {
       enabled = true,
       -- Default states for showing different file types
-      hidden = false,       -- Hide hidden files by default
-      follow = true,        -- Follow cursor in real-time
+      hidden = true,       -- Hide hidden files by default
+      follow = false,        -- Follow cursor in real-time
       ignored = false,       -- Show ignored files (gitignored, etc.) by default
       -- Ivy layout with bottom position
-      layout = { 
-        preset = "ivy", 
+      layout = {
+        preset = "ivy",
         position = "bottom"
       },
     },
@@ -103,7 +103,7 @@ return {
   },
   keys = {
     -- File pickers with explicit options
-    { "<leader>ff", function() Snacks.picker.files() end, desc = "Find Files (All)" },
+    { "<leader>ff", function() Snacks.picker.files({ hidden = true }) end, desc = "Find Files (All)" },
     { "<leader>fg", function() Snacks.picker.grep({ hidden = true, ignored = true }) end, desc = "Live Grep (All)" },
     { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Find Buffers" },
     { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent Files" },

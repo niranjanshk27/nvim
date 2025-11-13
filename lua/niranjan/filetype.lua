@@ -16,12 +16,12 @@ vim.filetype.add({
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   pattern = {
     "*/playbooks/*.yml",
-    "*/playbooks/*.yaml", 
+    "*/playbooks/*.yaml",
     "*playbook*.yml",
     "*playbook*.yaml",
     "*/roles/*/tasks/*.yml",
     "*/roles/*/tasks/*.yaml",
-    "*/roles/*/handlers/*.yml", 
+    "*/roles/*/handlers/*.yml",
     "*/roles/*/handlers/*.yaml",
     "*/group_vars/*",
     "*/host_vars/*",
@@ -55,5 +55,16 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     else
       vim.bo.filetype = "jinja"
     end
+  end,
+})
+
+-- GitHub Actions workflow detection
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    ".github/workflows/*.yml",
+    ".github/workflows/*.yaml",
+  },
+  callback = function()
+    vim.bo.filetype = "yaml.github"
   end,
 })
