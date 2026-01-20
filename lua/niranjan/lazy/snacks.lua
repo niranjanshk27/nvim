@@ -76,8 +76,8 @@ return {
           ["<C-u>"] = "preview_scroll_up",
           -- Quick actions
           ["<CR>"] = "confirm",
-          ["<C-s>"] = "confirm_split",
-          ["<C-v>"] = "confirm_vsplit",
+          -- ["<C-->"] = "confirm_split",
+          -- ["<C-\\>"] = "confirm_vsplit",
           ["<C-t>"] = "confirm_tab",
         }
       }
@@ -113,11 +113,15 @@ return {
     -- Specialized file pickers
     { "<leader>f.", function() Snacks.picker.files({ hidden = true, ignored = false, cwd = vim.fn.expand("~") }) end, desc = "Find Dotfiles" },
     -- LSP pickers
-    { "<leader>lr", function() Snacks.picker.lsp_references() end, desc = "LSP References" },
-    { "<leader>ld", function() Snacks.picker.lsp_definitions() end, desc = "LSP Definitions" },
-    { "<leader>li", function() Snacks.picker.lsp_implementations() end, desc = "LSP Implementations" },
-    { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
-    { "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
+    { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
+    { "gD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
+    { "gr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
+    { "gI", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
+    { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
+    { "gai", function() Snacks.picker.lsp_incoming_calls() end, desc = "C[a]lls Incoming" },
+    { "gao", function() Snacks.picker.lsp_outgoing_calls() end, desc = "C[a]lls Outgoing" },
+    { "<leader>ss", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
+    { "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
     -- Other useful pickers
     { "<leader>fc", function() Snacks.picker.commands() end, desc = "Commands" },
     { "<leader>fO", function() Snacks.picker.vim_options() end, desc = "Vim Options" },
