@@ -3,17 +3,15 @@ return {
   ---@module 'oil'
   ---@type oil.SetupOpts
   opts = {},
-  dependencies = { 
+  dependencies = {
     { "echasnovski/mini.icons", opts = {} },
     -- Alternative: { "nvim-tree/nvim-web-devicons" }
   },
   lazy = false,
-  
   config = function()
     require("oil").setup({
       -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
       default_file_explorer = true,
-      
       -- Id is automatically added at the beginning, and name at the end
       -- See :help oil-columns
       columns = {
@@ -22,14 +20,12 @@ return {
         "mtime",
         "icon",
       },
-      
       -- Buffer-local options to use for oil buffers
       buf_options = {
         buflisted = false,
         bufhidden = "hide",
         buftype = "",
       },
-      
       -- Window-local options to use for oil buffers
       win_options = {
         wrap = false,
@@ -41,22 +37,17 @@ return {
         conceallevel = 3,
         concealcursor = "nvic",
       },
-      
       -- Send deleted files to the trash instead of permanently deleting them (:help oil-trash)
       delete_to_trash = false,
-      
       -- Skip the confirmation popup for simple operations (:help oil.skip-confirm)
       skip_confirm_for_simple_edits = false,
-      
       -- Selecting a new/moved/renamed file or directory will prompt you to save changes first
       -- (:help prompt_save_on_select_new_entry)
       prompt_save_on_select_new_entry = true,
-      
       -- Oil will automatically delete hidden buffers after this delay
       -- You can set this to false to disable cleanup entirely
       -- Note that the cleanup process only starts when you enter Oil the first time
       cleanup_delay_ms = 2000,
-      
       lsp_file_methods = {
         -- Time to wait for LSP file operations to complete before skipping
         timeout_ms = 1000,
@@ -64,21 +55,17 @@ return {
         -- Set to "unmodified" to only autosave unmodified buffers
         autosave_changes = false,
       },
-      
       -- Constrain the cursor to the editable parts of the oil buffer
       -- Set to `false` to disable, or "name" to keep it on the file names
       constrain_cursor = "editable",
-      
       -- Set to true to watch the filesystem for changes and reload oil
       watch_for_changes = false,
-      
       -- Keymaps in oil buffer. Can be any value that `vim.keymap.set` accepts OR a table of keymap
       -- options with a `callback` (e.g. { callback = function() ... end, desc = "..." })
       -- Additionally, if it is a string that matches "actions.<name>",
       -- it will use the mapping at require("oil.actions").<name>
       -- Set to `false` to remove a keymap
       -- See :help oil-actions for a list of all available actions
-      use_default_keymaps = true,
       keymaps = {
         ["g?"] = "actions.show_help",
         ["<CR>"] = "actions.select",
@@ -96,7 +83,6 @@ return {
         ["gx"] = "actions.open_external",
         ["g."] = "actions.toggle_hidden",
         ["g\\"] = "actions.toggle_trash",
-        
         -- Custom keymaps
         -- ["<leader>ff"] = "actions.select",
         -- ["<leader>fv"] = { "actions.select", opts = { vertical = true } },
@@ -107,23 +93,22 @@ return {
         -- ["<leader>fu"] = "actions.parent",
         -- ["<leader>fd"] = "actions.cd",
         -- ["<leader>fq"] = "actions.close",
-        
         -- Yank operations
         ["yy"] = "actions.copy_entry_path",
         ["yn"] = "actions.copy_entry_filename",
-        
+        -- File operations
+        ["Y"] = "actions.copy_to_system_clipboard",
+        -- ["M"] = "actions.move_entry",
+        ["P"] = "actions.paste_from_system_clipboard",
         -- Quick navigation
         ["H"] = "actions.parent",
         ["L"] = "actions.select",
-        
         -- Toggle operations
         ["gh"] = "actions.toggle_hidden",
         ["gt"] = "actions.toggle_trash",
       },
-      
       -- Set to false to disable all of the above keymaps
       use_default_keymaps = false,
-      
       view_options = {
         -- Show files and directories that start with "."
         show_hidden = true,
@@ -147,10 +132,8 @@ return {
           { "name", "asc" },
         },
       },
-      
       -- Extra arguments to pass to SCP when moving/copying files over SSH
       extra_scp_args = {},
-      
       -- EXPERIMENTAL support for performing file operations with git
       -- git = {
       --   -- Return true to automatically git add/mv/rm files
@@ -164,7 +147,6 @@ return {
       --     return false
       --   end,
       -- },
-      
       -- Configuration for the floating window in oil.open_float
       float = {
         -- Padding around the floating window
@@ -183,7 +165,6 @@ return {
           return conf
         end,
       },
-      
       -- Configuration for the actions floating preview window
       preview = {
         -- Width dimensions can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
@@ -206,7 +187,6 @@ return {
         -- Whether the preview window is automatically updated when the cursor is moved
         update_on_cursor_moved = true,
       },
-      
       -- Configuration for the floating progress window
       progress = {
         max_width = 0.9,
@@ -221,24 +201,20 @@ return {
           winblend = 0,
         },
       },
-      
       -- Configuration for the floating SSH window
       ssh = {
         border = "rounded",
       },
-      
       -- Configuration for the floating keymaps help window
       keymaps_help = {
         border = "rounded",
       },
     })
-    
     -- Global keymaps for oil
     -- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
     -- vim.keymap.set("n", "<leader>-", "<CMD>Oil --float<CR>", { desc = "Open parent directory in floating window" })
     -- vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Open file explorer" })
     vim.keymap.set("n", "<leader>E", "<CMD>Oil --float<CR>", { desc = "Open file explorer in floating window" })
-    
     -- Optional: Set up autocommands for better performance
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "oil",
@@ -253,7 +229,6 @@ return {
         vim.opt_local.wrap = false
       end,
     })
-    
     -- Optional: Create command to toggle oil
     vim.api.nvim_create_user_command("OilToggle", function()
       if vim.bo.filetype == "oil" then
