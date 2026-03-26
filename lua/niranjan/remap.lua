@@ -27,6 +27,7 @@ vim.keymap.set("n", "<leader>PP", [["+P]], { desc = "Paste before from system cl
 
 -- Buffer navigation
 vim.keymap.set("n", "<C-o>", ":bnext<CR>", { desc = "Next buffer", noremap = true, silent = true })
+vim.keymap.set("n", "<S-Tab>", ":bnext<CR>", { desc = "Next buffer", noremap = true, silent = true })
 vim.keymap.set("n", "<C-i>", ":bprevious<CR>", { desc = "Previous buffer", noremap = true, silent = true })
 
 -- leader + s to save the file.
