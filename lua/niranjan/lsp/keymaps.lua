@@ -6,8 +6,8 @@ function M.on_attach(client, buffer)
   -- Keybindings for LSP navigation, actions, and information.
   local keymap = vim.keymap.set
   -- Information
-  keymap("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))
-  keymap("n", "<leader>k", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
+  keymap("n", "K", function() vim.lsp.buf.hover({ border = "rounded", max_width = 80, max_height = 20 }) end, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))
+  keymap("n", "<leader>k", function() vim.lsp.buf.signature_help({ border = "rounded", max_width = 80, max_height = 15 }) end, vim.tbl_extend("force", opts, { desc = "Signature Help" }))
   -- Action
   keymap("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code Action" }))
   keymap("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename Symbol" }))

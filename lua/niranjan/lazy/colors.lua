@@ -3,8 +3,8 @@ function ColorMyPencils(color)
     color = color or "tokyonight"
     vim.cmd.colorscheme(color)
 
-    vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+    vim.cmd("hi Normal guibg=none ctermbg=none")
+    vim.cmd("hi NormalFloat guibg=none ctermbg=none")
 end
 
 return {

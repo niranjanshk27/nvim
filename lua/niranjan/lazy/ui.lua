@@ -134,7 +134,7 @@ return {
             { "<C-w>s", desc = "Split Window" },
             { "<C-w>v", desc = "Vertical Split" },
             { "<C-w>q", desc = "Close Window" },
-            { "<C-w>s", desc = "Close Others" },
+            { "<C-w>a", desc = "Close Others" },
             { "<C-w>h", desc = "Move Left" },
             { "<C-w>j", desc = "Move Down" },
             { "<C-w>k", desc = "Move Up" },

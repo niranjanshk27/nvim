@@ -13,4 +13,13 @@ return {
   opts = {
     -- fill any relevant options here
   },
+
+  -- opts = {},
+  --
+  -- config = function(_, opts)
+  --   require("neo-tree").setup(opts)
+  --   vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>")
+  -- end,
+
+
 }

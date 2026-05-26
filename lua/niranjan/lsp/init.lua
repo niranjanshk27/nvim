@@ -14,6 +14,10 @@ function M.get_capabilities()
   capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { "documentation", "detail", "additionalTextEdits" },
   }
+  -- Disable workspace/didChangeWatchedFiles to prevent Neovim crash on macOS when deleting node_modules
+  capabilities.workspace = capabilities.workspace or {}
+  capabilities.workspace.didChangeWatchedFiles = capabilities.workspace.didChangeWatchedFiles or {}
+  capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
   return capabilities
 end
 
@@ -43,11 +47,8 @@ end
 
 -- This is the main setup function for your LSP configurations.
 function M.setup()
-  vim.lsp.set_log_level("error")
+  vim.lsp.log.set_level(vim.log.levels.ERROR)
   vim.opt.updatetime = 250
-
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded", max_width = 80, max_height = 20 })
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded", max_width = 80, max_height = 15 })
 
   vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('UserLspConfig', {}),
