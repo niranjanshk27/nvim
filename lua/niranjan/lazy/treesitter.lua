@@ -89,7 +89,7 @@ return {
                 -- INDENTATION
                 indent = {
                     enable = true,
-                    disable = { "python", "yaml" }, -- These languages have better indentation from other sources
+                    disable = { "python", "yaml", "lua" }, -- These languages have better indentation from other sources
                 },
 
                 -- FOLDING
@@ -184,7 +184,7 @@ return {
                     smart_rename = {
                         enable = true,
                         keymaps = {
-                            smart_rename = "<leader>grr",
+                            smart_rename = "<leader>srr",
                         },
                     },
                     -- navigation = {
