@@ -1,6 +1,7 @@
 return {
     {
         "nvim-treesitter/nvim-treesitter",
+        branch = "main",
         event = "BufReadPost",
         cmd = { "TSUpdate" },
         build = ":TSUpdate",
@@ -13,7 +14,7 @@ return {
             "JoosepAlviste/nvim-ts-context-commentstring",
         },
         config = function()
-            require("nvim-treesitter.configs").setup({
+            require("nvim-treesitter").setup({
                 -- Parser installation
                 ensure_installed = {
                     -- Core languages
@@ -88,7 +89,7 @@ return {
 
                 -- INDENTATION
                 indent = {
-                    enable = true,
+                    enable = false,
                     disable = { "python", "yaml", "lua" }, -- These languages have better indentation from other sources
                 },
 
@@ -230,7 +231,7 @@ return {
             })
 
             -- Custom parser configurations
-            local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+            local parser_config = require("nvim-treesitter.parsers")
             
             -- Templ parser (Go templating)
             parser_config.templ = {
@@ -321,14 +322,80 @@ return {
     -- TREESITTER TEXTOBJECTS
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
+        branch = "main",
         after = "nvim-treesitter",
+        config = function()
+            require("nvim-treesitter-textobjects").setup({
+                select = {
+                    enable = true,
+                    lookahead = true,
+                    keymaps = {
+                        ["af"] = "@function.outer",
+                        ["if"] = "@function.inner",
+                        ["ac"] = "@class.outer",
+                        ["ic"] = "@class.inner",
+                        ["aa"] = "@parameter.outer",
+                        ["ia"] = "@parameter.inner",
+                        ["ab"] = "@block.outer",
+                        ["ib"] = "@block.inner",
+                        ["ai"] = "@conditional.outer",
+                        ["ii"] = "@conditional.inner",
+                        ["al"] = "@loop.outer",
+                        ["il"] = "@loop.inner",
+                        ["ak"] = "@comment.outer",
+                        ["ik"] = "@comment.inner",
+                    },
+                    selection_modes = {
+                        ['@parameter.outer'] = 'v',
+                        ['@function.outer'] = 'V',
+                        ['@class.outer'] = '<c-v>',
+                    },
+                    include_surrounding_whitespace = true,
+                },
+                swap = {
+                    enable = true,
+                    swap_next = {
+                        ["<leader>ao"] = "@parameter.inner",
+                        ["<leader>fo"] = "@function.outer",
+                    },
+                    swap_previous = {
+                        ["<leader>AO"] = "@parameter.inner",
+                        ["<leader>FO"] = "@function.outer",
+                    },
+                },
+                move = {
+                    enable = true,
+                    set_jumps = true,
+                    goto_next_start = {
+                        ["]m"] = "@function.outer",
+                        ["]]"] = "@class.outer",
+                        ["]a"] = "@parameter.inner",
+                    },
+                    goto_next_end = {
+                        ["]M"] = "@function.outer",
+                        ["]["] = "@class.outer",
+                        ["]A"] = "@parameter.inner",
+                    },
+                    goto_previous_start = {
+                        ["[m"] = "@function.outer",
+                        ["[["] = "@class.outer",
+                        ["[a"] = "@parameter.inner",
+                    },
+                    goto_previous_end = {
+                        ["[M"] = "@function.outer",
+                        ["[]"] = "@class.outer",
+                        ["[A"] = "@parameter.inner",
+                    },
+                },
+            })
+        end
     },
 
     -- TREESITTER REFACTOR
-    {
-        "nvim-treesitter/nvim-treesitter-refactor",
-        after = "nvim-treesitter",
-    },
+    -- {
+    --     "nvim-treesitter/nvim-treesitter-refactor",
+    --     after = "nvim-treesitter",
+    -- },
 
     -- PLAYGROUND
     {
