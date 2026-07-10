@@ -28,10 +28,6 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.updatetime = 50
+vim.opt.updatetime = 300
 vim.opt.termguicolors = true
 -- vim.opt.colorcolumn = "80"
-
--- vim.opt.foldmethod = "indent"
--- vim.opt.foldmethod = "expr"
--- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"

@@ -224,7 +224,7 @@ return {
                 query_linter = {
                     enable = true,
                     use_virtual_text = true,
-                    lint_events = {"BufWrite", "CursorHold"},
+                    lint_events = {"BufWrite"},
                 },
 
 
@@ -262,11 +262,7 @@ return {
                 require("nvim-treesitter-playground.internal").toggle()
             end, {})
 
-            -- Set folding method to use treesitter
-            vim.wo.foldmethod = "expr"
-            vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-            vim.wo.foldlevel = 99 -- Start with most folds open
-            vim.opt.foldlevelstart = 99 -- Start with most folds open (global option)
+            -- Folding is handled by nvim-ufo
 
             -- Custom highlights for better visibility
             vim.cmd([[

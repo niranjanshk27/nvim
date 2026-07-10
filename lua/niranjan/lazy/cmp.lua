@@ -106,12 +106,13 @@ return {
     })
 
   -- NEW: Setup cmdline completion for '/' (search)
-    cmp.setup.cmdline('/', {
-      mapping = cmp.mapping.preset.cmdline(),
-      sources = {
-        { name = 'buffer' }
-      }
-    })
+  -- Disabled to prevent lag on large files
+  -- cmp.setup.cmdline('/', {
+  --   mapping = cmp.mapping.preset.cmdline(),
+  --   sources = {
+  --     { name = 'buffer' }
+  --   }
+  -- })
 
     -- NEW: Setup cmdline completion for ':' (commands)
     cmp.setup.cmdline(':', {
