@@ -79,13 +79,14 @@ return {
     })
 
     -- HTML/XML tag completion
-    autopairs.add_rules({
-      Rule('<', '>')
-        :with_pair(ts_conds.is_not_ts_node({'string', 'comment'}))
-        :with_move(function(opts)
-          return opts.char == '>'
-        end),
-    })
+    -- Disabled to prevent conflict with nvim-ts-autotag
+    -- autopairs.add_rules({
+    --   Rule('<', '>')
+    --     :with_pair(ts_conds.is_not_ts_node({'string', 'comment'}))
+    --     :with_move(function(opts)
+    --       return opts.char == '>'
+    --     end),
+    -- })
 
     -- Markdown code blocks
     autopairs.add_rules({
@@ -105,12 +106,14 @@ return {
     })
 
     -- Integration with nvim-cmp (if you use it)
-    local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-    local cmp = require('cmp')
-    cmp.event:on(
-      'confirm_done',
-      cmp_autopairs.on_confirm_done()
-    )
+    local has_cmp, cmp = pcall(require, 'cmp')
+    if has_cmp then
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      cmp.event:on(
+        'confirm_done',
+        cmp_autopairs.on_confirm_done()
+      )
+    end
 
     -- Optional: Custom keymaps
     local function set_keymaps()

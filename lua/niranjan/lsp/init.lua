@@ -2,13 +2,16 @@ local M = {}
 
 -- This function provides the LSP capabilities that will be shared across all servers.
 function M.get_capabilities()
-  local cmp_lsp = require("cmp_nvim_lsp")
-  local capabilities = vim.tbl_deep_extend(
-    "force",
-    {},
-    vim.lsp.protocol.make_client_capabilities(),
-    cmp_lsp.default_capabilities()
-  )
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  
+  local has_blink, blink = pcall(require, "blink.cmp")
+  local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+
+  if has_blink then
+    capabilities = blink.get_lsp_capabilities(capabilities)
+  elseif has_cmp then
+    capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
+  end
   -- Performance: configure capabilities
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   capabilities.textDocument.completion.completionItem.resolveSupport = {
