@@ -2,16 +2,11 @@ return {
     {
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
-        event = "BufReadPost",
+        event = { "BufReadPost", "BufNewFile", "BufWritePre" },
         cmd = { "TSUpdate" },
         build = ":TSUpdate",
         dependencies = {
             "nvim-lua/plenary.nvim",
-            "nvim-treesitter/nvim-treesitter-textobjects",
-            "nvim-treesitter/nvim-treesitter-context",
-            "nvim-treesitter/nvim-treesitter-refactor",
-            "nvim-treesitter/playground",
-            "JoosepAlviste/nvim-ts-context-commentstring",
         },
         config = function()
             require("nvim-treesitter").setup({
@@ -41,7 +36,7 @@ return {
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
-                sync_install = true,
+                sync_install = false,
 
                 -- Automatically install missing parsers when entering buffer
                 auto_install = true,
@@ -61,7 +56,7 @@ return {
 
                         -- Disable for large files
                         local max_filesize = 100 * 1024 -- 100 KB
-                        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+                        local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
                         if ok and stats and stats.size > max_filesize then
                             vim.notify(
                                 "File larger than 100KB - treesitter disabled for performance",
@@ -276,7 +271,7 @@ return {
     -- TREESITTER CONTEXT
     {
         "nvim-treesitter/nvim-treesitter-context",
-        event = "BufReadPost",
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
         config = function()
             require("treesitter-context").setup({
                 enable = true,
@@ -306,7 +301,7 @@ return {
     -- CONTEXT COMMENTSTRING
     {
         "JoosepAlviste/nvim-ts-context-commentstring",
-        event = "BufReadPost",
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
         config = function()
             vim.g.skip_ts_context_commentstring_module = true
             require("ts_context_commentstring").setup({
@@ -319,7 +314,7 @@ return {
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
         branch = "main",
-        after = "nvim-treesitter",
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
         config = function()
             require("nvim-treesitter-textobjects").setup({
                 select = {
@@ -392,11 +387,6 @@ return {
     --     "nvim-treesitter/nvim-treesitter-refactor",
     --     after = "nvim-treesitter",
     -- },
-
-    -- PLAYGROUND
-    {
-        "nvim-treesitter/playground",
-        cmd = "TSPlaygroundToggle",
-        after = "nvim-treesitter",
-    },
 }
+
+

@@ -15,7 +15,16 @@ return {
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "j-hui/fidget.nvim",
-    "folke/neodev.nvim",
+    {
+      "folke/lazydev.nvim",
+      ft = "lua",
+      opts = {
+        library = {
+          { path = "luvit-meta/library", words = { "vim%.uv" } },
+        },
+      },
+    },
+    { "Bilal2453/luvit-meta", lazy = true },
     "b0o/schemastore.nvim",
   },
   config = function()
@@ -25,14 +34,6 @@ return {
         window = {
           winblend = 0
         }
-      }
-    })
-    require("neodev").setup({
-      library = {
-        enabled = true,
-        runtime = true,
-        types = true,
-        plugins = true,
       }
     })
     require("mason").setup({
