@@ -10,6 +10,10 @@ vim.filetype.add({
     [".*%.appfile$"] = "ruby",
     [".*%.matchfile$"] = "ruby",
   },
+  extension = {
+    tf = "terraform",
+    tfvars = "terraform-vars",
+  },
 })
 
 -- Ansible filetype detection
