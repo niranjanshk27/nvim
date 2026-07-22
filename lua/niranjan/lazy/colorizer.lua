@@ -1,8 +1,8 @@
 return {
-  'norcalli/nvim-colorizer.lua',
+  'NvChad/nvim-colorizer.lua',
   event = { "BufReadPost", "BufNewFile" },
-  config = function()
-    require("colorizer").setup({
+  opts = {
+    filetypes = {
       css = { rgb_fn = true },
       html = { names = true },
       javascript = { rgb_fn = true },
@@ -10,8 +10,8 @@ return {
       typescript = { rgb_fn = true },
       typescriptreact = { rgb_fn = true },
     },
-    {
-      mode = "background", -- "foreground" | "background"
-    })
-  end,
+    user_default_options = {
+      mode = "background",
+    },
+  },
 }
